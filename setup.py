@@ -12,7 +12,7 @@ for package in install_requires:
 
 setup(
     name='timsconvert',
-    version='2.0.0',
+    version='2.1.0-alpha',
     url='https://github.com/gtluu/timsconvert',
     license='Apache License 2.0',
     author='Gordon T. Luu',
@@ -23,7 +23,8 @@ setup(
                   'timsconvert': ['*.json', '*.ui']},
     description='TIMSCONVERT: A simple workflow for conversion of trapped ion mobility data to open-source formats',
     entry_points={'console_scripts': ['timsconvert=bin.cmd:main',
-                                      'timsconvert_gui=bin.gui:main']},
+                                      'timsconvert_gui=bin.gui:main',
+                                      'timsconvert_nanodesi=bin.nanodesi:main']},
     install_requires=install_requires,
     setup_requires=install_requires
 )
