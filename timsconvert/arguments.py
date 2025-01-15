@@ -11,8 +11,6 @@ def get_args():
     """
     Parse command line parameters, including required, optional, and system parameters.
 
-    :param server: If enabled, allows the user to specify a custom url using the "--url" parameter, defaults to False
-    :type server: bool
     :return: Arguments with default or user specified values.
     :rtype: dict
     """
@@ -138,10 +136,3 @@ def args_check(args):
         print(get_iso8601_timestamp() + ':' + 'Plate map path does not exist...')
         print(get_iso8601_timestamp() + ':' + 'Exiting...')
         sys.exit(1)
-    # Check if server URL is valid.
-    if 'url' in args.keys():
-        response = requests.get(args['url'])
-        if response.status_code != 200:
-            print(get_iso8601_timestamp() + ':' + 'URL is not valid or server is down...')
-            print(get_iso8601_timestamp() + ':' + 'Exiting...')
-            response.raise_for_status()

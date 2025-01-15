@@ -1,14 +1,8 @@
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-                            QMetaObject, QObject, QPoint, QRect,
-                            QSize, QTime, QUrl, Qt, QTimer)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-                           QFont, QFontDatabase, QGradient, QIcon,
-                           QImage, QKeySequence, QLinearGradient, QPainter,
-                           QPalette, QPixmap, QRadialGradient, QTransform, QAction)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QLabel, QLineEdit,
-                               QListView, QMainWindow, QPushButton, QRadioButton,
-                               QSizePolicy, QSpinBox, QWidget, QButtonGroup, QTableWidget, QHeaderView,
-                               QProgressBar, QTableWidgetItem, QAbstractItemView, QMenu, QMenuBar)
+from PySide6.QtCore import QCoreApplication, QMetaObject, QRect, QSize
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import (QCheckBox, QLabel, QLineEdit, QPushButton, QRadioButton, QSizePolicy, QSpinBox, QWidget,
+                               QButtonGroup, QTableWidget, QHeaderView, QTableWidgetItem, QAbstractItemView, QMenu,
+                               QMenuBar)
 
 
 class Ui_TimsconvertGuiWindow(object):

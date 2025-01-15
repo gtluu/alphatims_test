@@ -1,4 +1,4 @@
-from timsconvert.constants import *
+from timsconvert.constants import MSMS_TYPE_CATEGORY
 import pandas as pd
 from pyTDFSDK.classes import TsfSpectrum, TdfSpectrum
 from pyTDFSDK.util import get_centroid_status
@@ -323,7 +323,7 @@ def parse_maldi_tdf(tdf_data, frame_start, frame_stop, mode, ms2_only, exclude_m
     return list_of_scans
 
 
-def parse_maldi_tdf_iprm(tdf_data, frame_start, frame_stop, mode, ms2_only, exclude_mobility, profile_bins, mz_encoding,
+def parse_maldi_tdf_iprm(tdf_data, frame_start, frame_stop, mode, exclude_mobility, profile_bins, mz_encoding,
                          intensity_encoding, mobility_encoding, diapasef_window):
     list_of_scans = []
     exclude_mobility = get_centroid_status(mode, exclude_mobility)[1]

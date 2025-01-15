@@ -3,18 +3,13 @@ import sys
 import io
 import re
 import logging
-#from multiprocess import Pool, cpu_count, freeze_support
 from timsconvert.data_input import dot_d_detection
 from timsconvert.timestamp import get_timestamp, get_iso8601_timestamp
 from timsconvert.convert import convert_raw_file, clean_up_logfiles
 from timsconvert.constants import VERSION
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale, QMetaObject, QObject, QPoint, QRect, QSize,
-                            QTime, QUrl, Qt, QTimer, QProcess)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont, QFontDatabase, QGradient, QIcon, QImage,
-                           QKeySequence, QLinearGradient, QPainter, QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QLabel, QLineEdit, QListView, QMainWindow, QPushButton,
-                               QRadioButton, QSizePolicy, QSpinBox, QWidget, QFileDialog, QProgressBar, QDialog,
-                               QDialogButtonBox, QVBoxLayout, QMessageBox, QTableWidgetItem)
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (QApplication, QMainWindow, QFileDialog, QProgressBar, QMessageBox, QTableWidgetItem)
 from timsconvert.timsconvert_gui_template import Ui_TimsconvertGuiWindow
 
 
@@ -351,8 +346,6 @@ class TimsconvertGuiWindow(QMainWindow, Ui_TimsconvertGuiWindow):
 
 
 def main():
-    #freeze_support()
-
     app = QApplication([])
 
     window = TimsconvertGuiWindow()
