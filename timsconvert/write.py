@@ -1352,3 +1352,50 @@ def write_maldi_ims_iprm_imzml(data, outdir, outfile, mode, exclude_mobility, pr
                                      ':Progress:100%\n')
     logging.info(
         get_iso8601_timestamp() + ':' + 'Finished writing to .imzML file ' + os.path.join(outdir, outfile) + '...')
+
+
+def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobility, profile_bins,
+                              mz_encoding, intensity_encoding, mobility_encoding, compression, barebones_metadata,
+                              chunk_size):
+    # Set polarity for run in mzML.
+    # maybe not necessary?
+
+    # Get compression type object.
+    # also maybe not necessary?
+
+    if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
+        if mode == 'profile':
+            exclude_mobility = True
+            logging.info(get_iso8601_timestamp() + ':' + 'Export of ion mobility data is not supported for profile mode data...')
+            logging.info(get_iso8601_timestamp() + ':' + 'Exporting without ion mobility data...')
+        msms_mode_id = data.analysis['PropertyDefinitions'][data.analysis['PropertyDefinitions']['PermanentName'] == 'Mode_ScanMode'].to_dict(orient='records')[0]['Id']
+        properties_dict = data.analysis['Properties'][data.analysis['Properties']['Property'] == msms_mode_id].to_dict(orient='records')
+        if all(i['Value'] == 12 for i in properties_dict):
+            if not data.analysis['DiaFrameMsMsWindows'].empty:
+                writers = {}
+                for index, row in data.analysis['DiaFrameMsMsWindows'].iterrows():
+                    suffix = f"mz{round(row['IsolationMz'])}_ScanNum{round(row['ScanNumBegin'])}-{round(row['ScanNumEnd'])}"
+                    # tuple of MzmlWriter and diapasef_window
+                    writers[suffix] = (MzMLWriter(os.path.join(outdir,
+                                                               f'{os.path.splitext(outfile)[0]}_{suffix}.mzML'),
+                                                  close=True),
+                                       row)
+    for suffix, value in writers.items():
+        writer = value[0]
+        diapasef_window = value[1]
+        with writer:
+            # Begin mzML with controlled vocabularies (CV).
+            logging.info(get_iso8601_timestamp() + ':' + 'Initializing controlled vocabularies...')
+            writer.controlled_vocabularies()
+
+            # Start write acquistiion, instrument config, processing, etc. to mzML.
+            logging.info(get_iso8601_timestamp() + ':' + 'Writing mzML metadata...')
+            write_mzml_metadata(data, writer, infile, mode, ms2_only, barebones_metadata)
+
+            logging.info(get_iso8601_timestamp() + ':' + 'Writing to .mzML file ' + os.path.join(outdir, outfile) + '...')
+            # Parse chunks of data and write to spectrum element.
+            with writer.run(id='run',
+                            instrument_configuration='instrument',
+                            start_time=data.analysis['GlobalMetadata']['AcquisitionDateTime']):
+                # Count number of spectra in run by counting number of rows in diapasef window table
+                

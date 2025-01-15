@@ -97,6 +97,11 @@ def get_args():
                           default='processed',
                           type=str,
                           choices=['processed', 'continuous'])
+    optional.add_argument('--iprm_format',
+                          help=arg_descriptions['iprm_format'],
+                          default='mgf',
+                          type=str,
+                          choices=['mgf', 'mzml', 'imzml'])
 
     # System Arguments
     system = parser.add_argument_group('System Parameters')

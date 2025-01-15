@@ -15,5 +15,6 @@
     "maldi_output_file": "For MALDI dried droplet data, whether individual scans should be placed in individual files (\"individual\"), combined into a single file (\"combined\"), or combined by sample label (\"sample\"). Defaults to \"combined\".",
     "maldi_plate_map": "Plate map to be used for parsing spots if --maldi_output_file == \"individual\" or --maldi_output_file == \"sample\". Should be a .csv file with no header/index.",
     "imzml_mode": "Whether .imzML files should be written in \"processed\" or \"continuous\" mode. Defaults to \"processed\".",
+    "iprm_format": "Whether iprm-PASEF mode MS/MS spectra should be written as an \"mgf\", \"mzml\", or \"imzml\" file.",
     "verbose": "Boolean flag to determine whether to print logging output."
 }

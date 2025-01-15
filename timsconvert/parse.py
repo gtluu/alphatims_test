@@ -329,8 +329,6 @@ def parse_maldi_tdf_iprm(tdf_data, frame_start, frame_stop, mode, ms2_only, excl
     exclude_mobility = get_centroid_status(mode, exclude_mobility)[1]
 
     for frame in range(frame_start, frame_stop):
-        frames_dict = tdf_data.analysis['Frames'][tdf_data.analysis['Frames']['Id'] ==
-                                                  frame].to_dict(orient='records')[0]
         msms_mode_id = tdf_data.analysis['PropertyDefinitions'][tdf_data.analysis['PropertyDefinitions']['PermanentName'] ==
                                                                 'Mode_ScanMode'].to_dict(orient='records')[0]['Id']
         msms_mode = tdf_data.analysis['Properties'][(tdf_data.analysis['Properties']['Frame'] == frame) &

@@ -209,23 +209,31 @@ def convert_raw_file(tuple_args):
                                                             'Mode_ScanMode'].to_dict(orient='records')[0]['Id']
         properties_dicts = data.analysis['Properties'][data.analysis['Properties']['Property'] ==
                                                        msms_mode_id].to_dict(orient='records')
-        # iprm-PASEF workflow writes different imzML/ibd files for each precursor.
+        # iprm-PASEF workflow writes different MGF, mzML, or imzML/ibd files for each precursor.
         if all(i['Value'] == 12 for i in properties_dicts):
             logging.info(get_iso8601_timestamp() + ':' + '.tdf file detected...')
-            outfile = os.path.splitext(os.path.split(infile)[-1])[0] + '.imzML'
             logging.info(
                 get_iso8601_timestamp() + ':' + 'Processing MALDI-TIMS iprm-PASEF imaging mass spectrometry data...')
-            write_maldi_ims_iprm_imzml(data,
-                                       run_args['outdir'],
-                                       outfile,
-                                       run_args['mode'],
-                                       run_args['exclude_mobility'],
-                                       run_args['profile_bins'],
-                                       run_args['imzml_mode'],
-                                       run_args['mz_encoding'],
-                                       run_args['intensity_encoding'],
-                                       run_args['mobility_encoding'],
-                                       run_args['compression'])
+            if run_args['iprm_format'] == 'mgf':
+                logging.info(get_iso8601_timestamp() + ':' + 'Writing data to MGF file(s)...')
+                outfile = os.path.splitext(os.path.split(infile)[-1])[0] + '.mgf'
+            elif run_args['iprm_format'] == 'mzml':
+                logging.info(get_iso8601_timestamp() + ':' + 'Writing data to mzML file(s)...')
+                outfile = os.path.splitext(os.path.split(infile)[-1])[0] + '.mzML'
+            elif run_args['iprm_format'] == 'imzml':
+                logging.info(get_iso8601_timestamp() + ':' + 'Writing data to imzML file(s)...')
+                outfile = os.path.splitext(os.path.split(infile)[-1])[0] + '.imzML'
+                write_maldi_ims_iprm_imzml(data,
+                                           run_args['outdir'],
+                                           outfile,
+                                           run_args['mode'],
+                                           run_args['exclude_mobility'],
+                                           run_args['profile_bins'],
+                                           run_args['imzml_mode'],
+                                           run_args['mz_encoding'],
+                                           run_args['intensity_encoding'],
+                                           run_args['mobility_encoding'],
+                                           run_args['compression'])
         # Standard imzML export workflow.
         else:
             logging.info(get_iso8601_timestamp() + ':' + '.tdf file detected...')
