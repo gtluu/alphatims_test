@@ -4,7 +4,8 @@ import logging
 from timsconvert.timestamp import get_iso8601_timestamp, get_timestamp
 from timsconvert.data_input import check_for_multiple_analysis, schema_detection
 from timsconvert.classes import TimsconvertBafData, TimsconvertTsfData, TimsconvertTdfData
-from timsconvert.write import write_lcms_mzml, write_maldi_dd_mzml, write_maldi_ims_imzml, write_maldi_ims_iprm_imzml
+from timsconvert.write import (write_lcms_mzml, write_maldi_dd_mzml, write_maldi_ims_imzml, write_maldi_ims_iprm_imzml,
+                               write_maldi_ims_iprm_mzml)
 from pyTDFSDK.init_tdf_sdk import init_tdf_sdk_api
 from pyTDFSDK.ctypes_data_structures import PressureCompensationStrategy
 from pyBaf2Sql.init_baf2sql import init_baf2sql_api
@@ -220,6 +221,19 @@ def convert_raw_file(tuple_args):
             elif run_args['iprm_format'] == 'mzml':
                 logging.info(get_iso8601_timestamp() + ':' + 'Writing data to mzML file(s)...')
                 outfile = os.path.splitext(os.path.split(infile)[-1])[0] + '.mzML'
+                write_maldi_ims_iprm_mzml(data,
+                                          infile,
+                                          run_args['outdir'],
+                                          outfile,
+                                          run_args['mode'],
+                                          run_args['ms2_only'],
+                                          run_args['exclude_mobility'],
+                                          run_args['profile_bins'],
+                                          run_args['mz_encoding'],
+                                          run_args['intensity_encoding'],
+                                          run_args['mobility_encoding'],
+                                          run_args['compression'],
+                                          run_args['barebones_metadata'])
             elif run_args['iprm_format'] == 'imzml':
                 logging.info(get_iso8601_timestamp() + ':' + 'Writing data to imzML file(s)...')
                 outfile = os.path.splitext(os.path.split(infile)[-1])[0] + '.imzML'

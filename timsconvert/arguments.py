@@ -97,7 +97,7 @@ def get_args():
                           choices=['processed', 'continuous'])
     optional.add_argument('--iprm_format',
                           help=arg_descriptions['iprm_format'],
-                          default='mgf',
+                          default='mzml',
                           type=str,
                           choices=['mgf', 'mzml', 'imzml'])
 
