@@ -135,7 +135,7 @@ def convert_raw_file(tuple_args):
                             run_args['intensity_encoding'],
                             run_args['mobility_encoding'],
                             run_args['compression'],
-                            run_args['maldi_output_file'],
+                            run_args['maldi_output_mode'],
                             run_args['maldi_plate_map'],
                             run_args['barebones_metadata'])
 
@@ -197,7 +197,7 @@ def convert_raw_file(tuple_args):
                             run_args['intensity_encoding'],
                             run_args['mobility_encoding'],
                             run_args['compression'],
-                            run_args['maldi_output_file'],
+                            run_args['maldi_output_mode'],
                             run_args['maldi_plate_map'],
                             run_args['barebones_metadata'])
 

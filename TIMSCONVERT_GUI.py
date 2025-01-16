@@ -59,7 +59,7 @@ class TimsconvertGuiWindow(QMainWindow, Ui_TimsconvertGuiWindow):
                      'mobility_encoding': 64,  # QRadioButton
                      'barebones_metadata': False,  # QCheckbox
                      'profile_bins': 0,  # QLineEdit
-                     'maldi_output_file': 'combined',  # QRadioButton
+                     'maldi_output_mode': 'combined',  # QRadioButton
                      'maldi_plate_map': '',  # QLineEdit + QPushButton (select file dialogue button)
                      'imzml_mode': 'processed',  # QRadioButton
                      'verbose': False}  # QCheckbox
@@ -240,18 +240,18 @@ class TimsconvertGuiWindow(QMainWindow, Ui_TimsconvertGuiWindow):
             self.args['profile_bins'] = int(self.NumBinsSpinBox.text())
         else:
             self.args['profile_bins'] = 0
-        if (self.MaldiOutputFileCombinedRadio.isChecked() and
-                not self.MaldiOutputFileIndividualRadio.isChecked() and
-                not self.MaldiOutputFileSampleRadio.isChecked()):
-            self.args['maldi_output_file'] = 'combined'
-        elif (not self.MaldiOutputFileCombinedRadio.isChecked() and
-              self.MaldiOutputFileIndividualRadio.isChecked() and
-              not self.MaldiOutputFileSampleRadio.isChecked()):
-            self.args['maldi_output_file'] = 'individual'
-        elif (not self.MaldiOutputFileCombinedRadio.isChecked() and
-              not self.MaldiOutputFileIndividualRadio.isChecked() and
-              self.MaldiOutputFileSampleRadio.isChecked()):
-            self.args['maldi_output_file'] = 'sample'
+        if (self.MaldiOutputModeCombinedRadio.isChecked() and
+                not self.MaldiOutputModeIndividualRadio.isChecked() and
+                not self.MaldiOutputModeSampleRadio.isChecked()):
+            self.args['maldi_output_mode'] = 'combined'
+        elif (not self.MaldiOutputModeCombinedRadio.isChecked() and
+              self.MaldiOutputModeIndividualRadio.isChecked() and
+              not self.MaldiOutputModeSampleRadio.isChecked()):
+            self.args['maldi_output_mode'] = 'individual'
+        elif (not self.MaldiOutputModeCombinedRadio.isChecked() and
+              not self.MaldiOutputModeIndividualRadio.isChecked() and
+              self.MaldiOutputModeSampleRadio.isChecked()):
+            self.args['maldi_output_mode'] = 'sample'
         self.args['maldi_plate_map'] = str(self.MaldiPlateMapLine.text())
         if self.MaldiImzmlModeProcessedRadio.isChecked() and not self.MaldiImzmlModeContinuousRadio.isChecked():
             self.args['imzml_mode'] = 'processed'

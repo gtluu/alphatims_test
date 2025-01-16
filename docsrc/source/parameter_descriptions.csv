@@ -12,7 +12,7 @@ intensity_encoding,"Choose encoding for intensity array: 32-bit (""32"") or 64-b
 mobility_encoding,"Choose encoding for mobility array: 32-bit (""32"") or 64-bit (""64""). Defaults to 64-bit."
 profile_bins,Number of bins used to bin data when converting in profile mode. A value of 0 indicates no binning is performed. Defaults to 0.
 barebones_metadata,Only use basic mzML metadata. Use if downstream data analysis tools throw errors with descriptive CV terms.
-maldi_output_file,"For MALDI dried droplet data, whether individual scans should be placed in individual files (""individual""), combined into a single file (""combined""), or combined by sample label (""sample""). Defaults to ""combined""."
-maldi_plate_map,"Plate map to be used for parsing spots if --maldi_output_file == ""individual"" or --maldi_output_file == ""sample"". Should be a .csv file with no header/index."
+maldi_output_mode,"For MALDI dried droplet data, whether individual scans should be placed in individual files (""individual""), combined into a single file (""combined""), or combined by sample label (""sample""). Defaults to ""combined""."
+maldi_plate_map,"Plate map to be used for parsing spots if --maldi_output_mode == ""individual"" or --maldi_output_mode == ""sample"". Should be a .csv file with no header/index."
 imzml_mode,"Whether .imzML files should be written in ""processed"" or ""continuous"" mode. Defaults to ""processed""."
 verbose,Boolean flag to determine whether to print logging output.

@@ -629,7 +629,7 @@ def write_lcms_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobil
 
 
 def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobility, profile_bins, mz_encoding,
-                        intensity_encoding, mobility_encoding, compression, maldi_output_file, plate_map,
+                        intensity_encoding, mobility_encoding, compression, maldi_output_mode, plate_map,
                         barebones_metadata):
     """
     Parse and write out spectra to an mzML file from a MALDI-MS(/MS) dried droplet dataset using psims.
@@ -659,10 +659,10 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
     :type mobility_encoding: int
     :param compression: Compression command line parameter, either "zlib" or "none".
     :type compression: str
-    :param maldi_output_file: Determines whether all spectra from a given .d dataset are written to a single mzML file
+    :param maldi_output_mode: Determines whether all spectra from a given .d dataset are written to a single mzML file
         ("combined"), written to individual mzML files ("individual", i.e. one spectrum per file), or grouped to have
         one mzML file per annotation/label/condition ("sample", requires CSV plate_map to be specified).
-    :type maldi_output_file: str
+    :type maldi_output_mode: str
     :param plate_map: Path to the MALDI plate map in CSV format.
     :type plate_map: str
     :param barebones_metadata: If True, omit software and data processing metadata in the resulting mzML files. Used
@@ -677,7 +677,7 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
         frames_key = 'Frames'
         metadata_key = 'GlobalMetadata'
     # All spectra from a given TSF or TDF file are combined into a single mzML file.
-    if maldi_output_file == 'combined':
+    if maldi_output_mode == 'combined':
         # Initialize mzML writer using psims.
         logging.info(get_iso8601_timestamp() + ':' + 'Initializing mzML Writer...')
         writer = MzMLWriter(os.path.splitext(os.path.join(outdir, outfile))[0] + '_tmp.mzML', close=True)
@@ -768,7 +768,7 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
             get_iso8601_timestamp() + ':' + 'Finished writing to .mzML file ' + os.path.join(outdir, outfile) + '...')
 
     # Each spectrum in a given TSF or TDF file is output as its own individual mzML file.
-    elif maldi_output_file == 'individual' and plate_map != '':
+    elif maldi_output_mode == 'individual' and plate_map != '':
         # Check to make sure plate map is a valid csv file.
         if os.path.exists(plate_map) and os.path.splitext(plate_map)[1] == '.csv':
             # Parse all MALDI data.
@@ -854,7 +854,7 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
                                  '%\n')
 
     # Group spectra from a given TSF or TDF file by sample name based on user provided plate map.
-    elif maldi_output_file == 'sample' and plate_map != '':
+    elif maldi_output_mode == 'sample' and plate_map != '':
         # Check to make sure plate map is a valid csv file.
         if os.path.exists(plate_map) and os.path.splitext(plate_map)[1] == '.csv':
             # Parse all MALDI data.

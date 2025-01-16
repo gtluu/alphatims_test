@@ -81,8 +81,8 @@ def get_args():
                           help=arg_descriptions['profile_bins'],
                           default=0,
                           type=int)
-    optional.add_argument('--maldi_output_file',
-                          help=arg_descriptions['maldi_output_file'],
+    optional.add_argument('--maldi_output_mode',
+                          help=arg_descriptions['maldi_output_mode'],
                           default='combined',
                           type=str,
                           choices=['combined', 'individual', 'sample'])
@@ -124,14 +124,14 @@ def args_check(args):
     if not os.path.isdir(args['outdir']) and args['outdir'] != '':
         os.makedirs(args['outdir'])
     # Check if plate map path is valid and if plate map is available if --maldi_single_file is True.
-    if args['maldi_output_file'] != '' \
-            and args['maldi_output_file'] in ['individual', 'sample'] \
+    if args['maldi_output_mode'] != '' \
+            and args['maldi_output_mode'] in ['individual', 'sample'] \
             and args['maldi_plate_map'] == '':
         print(get_iso8601_timestamp() + ':' + 'Plate map is required for MALDI dried droplet data...')
         print(get_iso8601_timestamp() + ':' + 'Exiting...')
         sys.exit(1)
-    elif args['maldi_output_file'] != '' \
-            and args['maldi_output_file'] in ['individual', 'sample'] \
+    elif args['maldi_output_mode'] != '' \
+            and args['maldi_output_mode'] in ['individual', 'sample'] \
             and not os.path.exists(args['maldi_plate_map']):
         print(get_iso8601_timestamp() + ':' + 'Plate map path does not exist...')
         print(get_iso8601_timestamp() + ':' + 'Exiting...')

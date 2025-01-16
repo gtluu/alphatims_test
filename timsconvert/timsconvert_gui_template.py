@@ -231,27 +231,27 @@ class Ui_TimsconvertGuiWindow(object):
 
         # MALDI Dried Droplet Output Mode
         # Label
-        self.MaldiOutputFileLabel = QLabel(self.main)
-        self.MaldiOutputFileLabel.setObjectName(u"MaldiOutputFileLabel")
-        self.MaldiOutputFileLabel.setGeometry(QRect(430, 660, 351, 21))
+        self.MaldiOutputModeLabel = QLabel(self.main)
+        self.MaldiOutputModeLabel.setObjectName(u"MaldiOutputModeLabel")
+        self.MaldiOutputModeLabel.setGeometry(QRect(430, 660, 351, 21))
         # Combined
-        self.MaldiOutputFileCombinedRadio = QRadioButton(self.main)
-        self.MaldiOutputFileCombinedRadio.setObjectName(u"MaldiOutputFileCombinedRadio")
-        self.MaldiOutputFileCombinedRadio.setGeometry(QRect(430, 690, 351, 20))
+        self.MaldiOutputModeCombinedRadio = QRadioButton(self.main)
+        self.MaldiOutputModeCombinedRadio.setObjectName(u"MaldiOutputModeCombinedRadio")
+        self.MaldiOutputModeCombinedRadio.setGeometry(QRect(430, 690, 351, 20))
         # Individual
-        self.MaldiOutputFileIndividualRadio = QRadioButton(self.main)
-        self.MaldiOutputFileIndividualRadio.setObjectName(u"MaldiOutputFileIndividualRadio")
-        self.MaldiOutputFileIndividualRadio.setGeometry(QRect(430, 720, 351, 20))
+        self.MaldiOutputModeIndividualRadio = QRadioButton(self.main)
+        self.MaldiOutputModeIndividualRadio.setObjectName(u"MaldiOutputModeIndividualRadio")
+        self.MaldiOutputModeIndividualRadio.setGeometry(QRect(430, 720, 351, 20))
         # Sample
-        self.MaldiOutputFileSampleRadio = QRadioButton(self.main)
-        self.MaldiOutputFileSampleRadio.setObjectName(u"MaldiOutputFileSampleRadio")
-        self.MaldiOutputFileSampleRadio.setGeometry(QRect(430, 750, 351, 20))
+        self.MaldiOutputModeSampleRadio = QRadioButton(self.main)
+        self.MaldiOutputModeSampleRadio.setObjectName(u"MaldiOutputModeSampleRadio")
+        self.MaldiOutputModeSampleRadio.setGeometry(QRect(430, 750, 351, 20))
         # Group
-        self.MaldiOutputFileGroup = QButtonGroup()
-        self.MaldiOutputFileGroup.addButton(self.MaldiOutputFileCombinedRadio)
-        self.MaldiOutputFileGroup.addButton(self.MaldiOutputFileIndividualRadio)
-        self.MaldiOutputFileGroup.addButton(self.MaldiOutputFileSampleRadio)
-        self.MaldiOutputFileCombinedRadio.setChecked(True)
+        self.MaldiOutputModeGroup = QButtonGroup()
+        self.MaldiOutputModeGroup.addButton(self.MaldiOutputModeCombinedRadio)
+        self.MaldiOutputModeGroup.addButton(self.MaldiOutputModeIndividualRadio)
+        self.MaldiOutputModeGroup.addButton(self.MaldiOutputModeSampleRadio)
+        self.MaldiOutputModeCombinedRadio.setChecked(True)
 
         # MALDI Plate Map
         # Line Edit
@@ -349,15 +349,15 @@ class Ui_TimsconvertGuiWindow(object):
         self.NumBinsLabel.setText(QCoreApplication.translate("TimsconvertGuiWindow", u"Number of Bins", None))
         self.BinSpectraCheckbox.setText(
             QCoreApplication.translate("TimsconvertGuiWindow", u"Bin Profile Mode Spectra", None))
-        self.MaldiOutputFileLabel.setText(
+        self.MaldiOutputModeLabel.setText(
             QCoreApplication.translate("TimsconvertGuiWindow", u"MALDI Dried Droplet Output Mode", None))
-        self.MaldiOutputFileCombinedRadio.setText(QCoreApplication.translate("TimsconvertGuiWindow",
+        self.MaldiOutputModeCombinedRadio.setText(QCoreApplication.translate("TimsconvertGuiWindow",
                                                                              u"Combine All Spectra In a *.d File to a Single mzML File",
                                                                              None))
-        self.MaldiOutputFileIndividualRadio.setText(QCoreApplication.translate("TimsconvertGuiWindow",
+        self.MaldiOutputModeIndividualRadio.setText(QCoreApplication.translate("TimsconvertGuiWindow",
                                                                                u"Export Each Spectrum In a *.d File to Individual mzML Files",
                                                                                None))
-        self.MaldiOutputFileSampleRadio.setText(QCoreApplication.translate("TimsconvertGuiWindow",
+        self.MaldiOutputModeSampleRadio.setText(QCoreApplication.translate("TimsconvertGuiWindow",
                                                                            u"Group Spectra with Matching Sample Names into mzML Files",
                                                                            None))
         self.MaldiPlateMapBrowseButton.setText(QCoreApplication.translate("TimsconvertGuiWindow", u"Browse", None))

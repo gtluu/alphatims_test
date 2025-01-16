@@ -278,7 +278,7 @@
      <number>0</number>
     </property>
    </widget>
-   <widget class="QLabel" name="MaldiOutputFileLabel">
+   <widget class="QLabel" name="MaldiOutputModeLabel">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -291,7 +291,7 @@
      <string>MALDI Dried Droplet Output Mode</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="MaldiOutputFileCombinedRadio">
+   <widget class="QRadioButton" name="MaldiOutputModeCombinedRadio">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -307,7 +307,7 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QRadioButton" name="MaldiOutputFileIndividualRadio">
+   <widget class="QRadioButton" name="MaldiOutputModeIndividualRadio">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -320,7 +320,7 @@
      <string>Export Each Spectrum In a *.d File to Individual mzML Files</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="MaldiOutputFileSampleRadio">
+   <widget class="QRadioButton" name="MaldiOutputModeSampleRadio">
     <property name="geometry">
      <rect>
       <x>430</x>
