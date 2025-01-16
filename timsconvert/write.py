@@ -6,8 +6,10 @@ from timsconvert.timestamp import get_iso8601_timestamp
 import os
 import sys
 import logging
+import copy
 import numpy as np
 from psims.mzml import MzMLWriter
+from pyteomics import mgf
 from pyimzml.ImzMLWriter import ImzMLWriter
 from pyimzml.compression import NoCompression, ZlibCompression
 from pyTDFSDK.util import get_encoding_dtype
@@ -1601,4 +1603,228 @@ def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exc
                                                              data.source_file.replace('/', '\\') +
                                                              ':Progress:100%\n')
                     logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mzML file ' +
+                                 os.path.join(outdir, outfile) + '...')
+
+
+def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, profile_bins, mz_encoding,
+                             intensity_encoding, mobility_encoding, iprm_output_mode, chunk_size=10):
+    if iprm_output_mode == 'individual':
+        if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
+            if mode == 'profile':
+                exclude_mobility = True
+                logging.info(
+                    get_iso8601_timestamp() + ':' + 'Export of ion mobility data is not supported for profile mode data...')
+                logging.info(get_iso8601_timestamp() + ':' + 'Exporting without ion mobility data...')
+            msms_mode_id = data.analysis['PropertyDefinitions'][
+                data.analysis['PropertyDefinitions']['PermanentName'] == 'Mode_ScanMode'].to_dict(orient='records')[0][
+                'Id']
+            properties_dict = data.analysis['Properties'][
+                data.analysis['Properties']['Property'] == msms_mode_id].to_dict(orient='records')
+            if all(i['Value'] == 12 for i in properties_dict):
+                if not data.analysis['DiaFrameMsMsWindows'].empty:
+                    writers = {}
+                    for index, row in data.analysis['DiaFrameMsMsWindows'].iterrows():
+                        suffix = f"mz{round(row['IsolationMz'])}_ScanNum{round(row['ScanNumBegin'])}-{round(row['ScanNumEnd'])}"
+                        # tuple of mgf filename and diapasef_window
+                        writers[suffix] = (os.path.join(outdir, f'{os.path.splitext(outfile)[0]}_{suffix}.mgf'),
+                                           row)
+                    for suffix, value in writers.items():
+                        mgf_filename = value[0]
+                        diapasef_window = value[1]
+                        scan_count = 0
+                        chunk = 0
+                        if chunk == 0:
+                            mgf_file_mode = 'w'
+                        else:
+                            mgf_file_mode = 'a'
+                        frames = data.analysis['Frames']['Id'].to_list()
+                        # Write data in chunks of chunk_size.
+                        while chunk + chunk_size + 1 <= len(frames):
+                            chunk_list = []
+                            for i, j in zip(frames[chunk:chunk + chunk_size],
+                                            frames[chunk + 1: chunk + chunk_size + 1]):
+                                chunk_list.append((int(i), int(j)))
+                            logging.info(get_iso8601_timestamp() +
+                                         ':' +
+                                         'Parsing and writing Frame ' +
+                                         str(chunk_list[0][0]) +
+                                         ' from ' +
+                                         data.analysis['GlobalMetadata']['SampleName'] +
+                                         '...')
+                            for frame_start, frame_stop in chunk_list:
+                                # Parse iprm-PASEF TDF data.
+                                list_of_scans = parse_maldi_tdf_iprm(data,
+                                                                     frame_start,
+                                                                     frame_stop,
+                                                                     mode,
+                                                                     exclude_mobility,
+                                                                     profile_bins,
+                                                                     mz_encoding,
+                                                                     intensity_encoding,
+                                                                     mobility_encoding,
+                                                                     diapasef_window=diapasef_window)
+                                scan_count += 1
+                                ms2_dict_list = [{'m/z array': copy.deepcopy(scan.mz_array),
+                                                  'intensity array': copy.deepcopy(scan.intensity_array),
+                                                  'params': {'FEATURE_ID': scan_count,
+                                                             'PEPMASS': scan.selected_ion_mz,
+                                                             'ION_MOBILITY': scan.selected_ion_mobility,
+                                                             'MSLEVEL': 2}}
+                                                 for scan in list_of_scans]
+                                mgf.write(ms2_dict_list, output=mgf_filename, file_mode=mgf_file_mode)
+                                sys.stdout.write(get_iso8601_timestamp() +
+                                                 ':' +
+                                                 data.source_file.replace('/', '\\') +
+                                                 ':' +
+                                                 suffix +
+                                                 ':Progress:' +
+                                                 str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                                 '%\n')
+                            chunk += chunk_size
+                        # Last chunk may be smaller than chunk_size.
+                        else:
+                            chunk_list = []
+                            for i, j in zip(frames[chunk:-1], frames[chunk + 1:]):
+                                chunk_list.append((int(i), int(j)))
+                            chunk_list.append((j, data.analysis['Frames'].shape[0] + 1))
+                            logging.info(get_iso8601_timestamp() +
+                                         ':' +
+                                         'Parsing and writing Frame ' +
+                                         str(chunk_list[0][0]) +
+                                         ' from ' +
+                                         data.analysis['GlobalMetadata']['SampleName'] +
+                                         '...')
+                            for frame_start, frame_stop in chunk_list:
+                                # Parse iprm-PASEF TDF data.
+                                list_of_scans = parse_maldi_tdf_iprm(data,
+                                                                     frame_start,
+                                                                     frame_stop,
+                                                                     mode,
+                                                                     exclude_mobility,
+                                                                     profile_bins,
+                                                                     mz_encoding,
+                                                                     intensity_encoding,
+                                                                     mobility_encoding,
+                                                                     diapasef_window=diapasef_window)
+                                scan_count += 1
+                                ms2_dict_list = [{'m/z array': copy.deepcopy(scan.mz_array),
+                                                  'intensity array': copy.deepcopy(scan.intensity_array),
+                                                  'params': {'FEATURE_ID': scan_count,
+                                                             'PEPMASS': scan.selected_ion_mz,
+                                                             'ION_MOBILITY': scan.selected_ion_mobility,
+                                                             'MSLEVEL': 2}}
+                                                 for scan in list_of_scans]
+                                mgf.write(ms2_dict_list, output=mgf_filename, file_mode=mgf_file_mode)
+                                sys.stdout.write(get_iso8601_timestamp() +
+                                                 ':' +
+                                                 data.source_file.replace('/', '\\') +
+                                                 ':' +
+                                                 suffix +
+                                                 ':Progress:100%\n')
+                        logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mgf file ' +
+                                     os.path.join(outdir, outfile) + '...')
+    elif iprm_output_mode == 'combined':
+        if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
+            if mode == 'profile':
+                exclude_mobility = True
+                logging.info(
+                    get_iso8601_timestamp() + ':' + 'Export of ion mobility data is not supported for profile mode data...')
+                logging.info(get_iso8601_timestamp() + ':' + 'Exporting without ion mobility data...')
+            msms_mode_id = data.analysis['PropertyDefinitions'][
+                data.analysis['PropertyDefinitions']['PermanentName'] == 'Mode_ScanMode'].to_dict(orient='records')[0][
+                'Id']
+            properties_dict = data.analysis['Properties'][
+                data.analysis['Properties']['Property'] == msms_mode_id].to_dict(orient='records')
+            if all(i['Value'] == 12 for i in properties_dict):
+                if not data.analysis['DiaFrameMsMsWindows'].empty:
+                    mgf_filename = os.path.join(outdir, f'{os.path.splitext(outfile)[0]}.mgf')
+                    scan_count = 0
+                    chunk = 0
+                    if chunk == 0:
+                        mgf_file_mode = 'w'
+                    else:
+                        mgf_file_mode = 'a'
+                    frames = data.analysis['Frames']['Id'].to_list()
+                    # Write data in chunks of chunk_size.
+                    while chunk + chunk_size + 1 <= len(frames):
+                        chunk_list = []
+                        for i, j in zip(frames[chunk:chunk + chunk_size],
+                                        frames[chunk + 1: chunk + chunk_size + 1]):
+                            chunk_list.append((int(i), int(j)))
+                        logging.info(get_iso8601_timestamp() +
+                                     ':' +
+                                     'Parsing and writing Frame ' +
+                                     str(chunk_list[0][0]) +
+                                     ' from ' +
+                                     data.analysis['GlobalMetadata']['SampleName'] +
+                                     '...')
+                        for frame_start, frame_stop in chunk_list:
+                            for index, diapasef_window in data.analysis['DiaFrameMsMsWindows'].iterrows():
+                                # Parse iprm-PASEF TDF data.
+                                list_of_scans = parse_maldi_tdf_iprm(data,
+                                                                     frame_start,
+                                                                     frame_stop,
+                                                                     mode,
+                                                                     exclude_mobility,
+                                                                     profile_bins,
+                                                                     mz_encoding,
+                                                                     intensity_encoding,
+                                                                     mobility_encoding,
+                                                                     diapasef_window=diapasef_window)
+                                scan_count += 1
+                                ms2_dict_list = [{'m/z array': copy.deepcopy(scan.mz_array),
+                                                  'intensity array': copy.deepcopy(scan.intensity_array),
+                                                  'params': {'FEATURE_ID': scan_count,
+                                                             'PEPMASS': scan.selected_ion_mz,
+                                                             'ION_MOBILITY': scan.selected_ion_mobility,
+                                                             'MSLEVEL': 2}}
+                                                 for scan in list_of_scans]
+                                mgf.write(ms2_dict_list, output=mgf_filename, file_mode=mgf_file_mode)
+                                sys.stdout.write(get_iso8601_timestamp() +
+                                                 ':' +
+                                                 data.source_file.replace('/', '\\') +
+                                                 ':Progress:' +
+                                                 str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                                 '%\n')
+                        chunk += chunk_size
+                    # Last chunk may be smaller than chunk_size.
+                    else:
+                        chunk_list = []
+                        for i, j in zip(frames[chunk:-1], frames[chunk + 1:]):
+                            chunk_list.append((int(i), int(j)))
+                        chunk_list.append((j, data.analysis['Frames'].shape[0] + 1))
+                        logging.info(get_iso8601_timestamp() +
+                                     ':' +
+                                     'Parsing and writing Frame ' +
+                                     str(chunk_list[0][0]) +
+                                     ' from ' +
+                                     data.analysis['GlobalMetadata']['SampleName'] +
+                                     '...')
+                        for frame_start, frame_stop in chunk_list:
+                            for index, diapasef_window in data.analysis['DiaFrameMsMsWindows'].iterrows():
+                                # Parse iprm-PASEF TDF data.
+                                list_of_scans = parse_maldi_tdf_iprm(data,
+                                                                     frame_start,
+                                                                     frame_stop,
+                                                                     mode,
+                                                                     exclude_mobility,
+                                                                     profile_bins,
+                                                                     mz_encoding,
+                                                                     intensity_encoding,
+                                                                     mobility_encoding,
+                                                                     diapasef_window=diapasef_window)
+                                scan_count += 1
+                                ms2_dict_list = [{'m/z array': copy.deepcopy(scan.mz_array),
+                                                  'intensity array': copy.deepcopy(scan.intensity_array),
+                                                  'params': {'FEATURE_ID': scan_count,
+                                                             'PEPMASS': scan.selected_ion_mz,
+                                                             'ION_MOBILITY': scan.selected_ion_mobility,
+                                                             'MSLEVEL': 2}}
+                                                 for scan in list_of_scans]
+                                mgf.write(ms2_dict_list, output=mgf_filename, file_mode=mgf_file_mode)
+                                sys.stdout.write(get_iso8601_timestamp() +
+                                                 ':' +
+                                                 data.source_file.replace('/', '\\') +
+                                                 ':Progress:100%\n')
+                    logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mgf file ' +
                                  os.path.join(outdir, outfile) + '...')
