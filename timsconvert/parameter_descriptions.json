@@ -16,5 +16,6 @@
     "maldi_plate_map": "Plate map to be used for parsing spots if --maldi_output_mode == \"individual\" or --maldi_output_mode == \"sample\". Should be a .csv file with no header/index.",
     "imzml_mode": "Whether .imzML files should be written in \"processed\" or \"continuous\" mode. Defaults to \"processed\".",
     "iprm_format": "Whether iprm-PASEF mode MS/MS spectra should be written as an \"mgf\", \"mzml\", or \"imzml\" file.",
+    "iprm_output_mode": "Whether iprm-PASEF mode MS/MS spectra should all be written to the same \"mzml\" or \"mgf\" file (\"combined\") or to separate files per precursor (\"individual\"). If exporting iprm-PASEF to \"imzml\" files, \"individual\" mode will be used.",
     "verbose": "Boolean flag to determine whether to print logging output."
 }

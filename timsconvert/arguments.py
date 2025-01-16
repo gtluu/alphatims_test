@@ -85,7 +85,7 @@ def get_args():
                           help=arg_descriptions['maldi_output_mode'],
                           default='combined',
                           type=str,
-                          choices=['combined', 'individual', 'sample'])
+                          choices=['combined', 'individual', 'sample'])  # TODO: refactor 'sample' to 'group'
     optional.add_argument('--maldi_plate_map',
                           help=arg_descriptions['maldi_plate_map'],
                           default='',
@@ -100,6 +100,11 @@ def get_args():
                           default='mzml',
                           type=str,
                           choices=['mgf', 'mzml', 'imzml'])
+    optional.add_argument('--iprm_output_mode',
+                          help=arg_descriptions['iprm_output_mode'],
+                          default='combined',
+                          type=str,
+                          choices=['combined', 'individual'])
 
     # System Arguments
     system = parser.add_argument_group('System Parameters')

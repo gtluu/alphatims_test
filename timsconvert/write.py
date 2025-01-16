@@ -1283,77 +1283,78 @@ def write_maldi_ims_iprm_imzml(data, outdir, outfile, mode, exclude_mobility, pr
                                                        include_mobility=False),
                                            row)
 
-    for suffix, value in writers.items():
-        writer = value[0]
-        diapasef_window = value[1]
-        logging.info(get_iso8601_timestamp() + ':' + 'Writing to .imzML file ' + os.path.join(outdir, outfile) + '...')
-        with writer as imzml_file:
-            chunk = 0
-            frames = data.analysis['Frames']['Id'].to_list()
-            while chunk + chunk_size + 1 <= len(frames):
-                chunk_list = []
-                for i, j in zip(frames[chunk:chunk + chunk_size], frames[chunk + 1: chunk + chunk_size + 1]):
-                    chunk_list.append((int(i), int(j)))
-                logging.info(get_iso8601_timestamp() +
-                             ':' +
-                             'Parsing and writing Frame ' +
-                             str(chunk_list[0][0]) +
-                             ' from ' +
-                             data.analysis['GlobalMetadata']['SampleName'] +
-                             '...')
-                for frame_start, frame_stop in chunk_list:
-                    write_maldi_ims_chunk_to_imzml(data,
-                                                   imzml_file,
-                                                   frame_start,
-                                                   frame_stop,
-                                                   mode,
-                                                   exclude_mobility,
-                                                   profile_bins,
-                                                   mz_encoding,
-                                                   intensity_encoding,
-                                                   mobility_encoding,
-                                                   diapasef_window=diapasef_window)
-                    sys.stdout.write(get_iso8601_timestamp() +
-                                     ':' +
-                                     data.source_file.replace('/', '\\') +
-                                     ':' +
-                                     suffix +
-                                     ':Progress:' +
-                                     str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
-                                     '%\n')
-                chunk += chunk_size
-            else:
-                chunk_list = []
-                for i, j in zip(frames[chunk:-1], frames[chunk + 1:]):
-                    chunk_list.append((int(i), int(j)))
-                chunk_list.append((j, data.analysis['Frames'].shape[0] + 1))
-                logging.info(get_iso8601_timestamp() +
-                             ':' +
-                             'Parsing and writing Frame ' +
-                             str(chunk_list[0][0]) +
-                             ' from ' +
-                             data.analysis['GlobalMetadata']['SampleName'] +
-                             '...')
-                for frame_start, frame_stop in chunk_list:
-                    write_maldi_ims_chunk_to_imzml(data,
-                                                   imzml_file,
-                                                   frame_start,
-                                                   frame_stop,
-                                                   mode,
-                                                   exclude_mobility,
-                                                   profile_bins,
-                                                   mz_encoding,
-                                                   intensity_encoding,
-                                                   mobility_encoding,
-                                                   diapasef_window=diapasef_window)
-                    sys.stdout.write(get_iso8601_timestamp() +
-                                     ':' +
-                                     data.source_file.replace('/', '\\') +
-                                     ':' +
-                                     suffix +
-                                     ':Progress:100%\n')
-    logging.info(
-        get_iso8601_timestamp() + ':' + 'Finished writing to .imzML file ' + os.path.join(outdir, outfile) + '...')
+                for suffix, value in writers.items():
+                    writer = value[0]
+                    diapasef_window = value[1]
+                    logging.info(get_iso8601_timestamp() + ':' + 'Writing to .imzML file ' + os.path.join(outdir, outfile) + '...')
+                    with writer as imzml_file:
+                        chunk = 0
+                        frames = data.analysis['Frames']['Id'].to_list()
+                        while chunk + chunk_size + 1 <= len(frames):
+                            chunk_list = []
+                            for i, j in zip(frames[chunk:chunk + chunk_size],
+                                            frames[chunk + 1: chunk + chunk_size + 1]):
+                                chunk_list.append((int(i), int(j)))
+                            logging.info(get_iso8601_timestamp() +
+                                         ':' +
+                                         'Parsing and writing Frame ' +
+                                         str(chunk_list[0][0]) +
+                                         ' from ' +
+                                         data.analysis['GlobalMetadata']['SampleName'] +
+                                         '...')
+                            for frame_start, frame_stop in chunk_list:
+                                write_maldi_ims_chunk_to_imzml(data,
+                                                               imzml_file,
+                                                               frame_start,
+                                                               frame_stop,
+                                                               mode,
+                                                               exclude_mobility,
+                                                               profile_bins,
+                                                               mz_encoding,
+                                                               intensity_encoding,
+                                                               mobility_encoding,
+                                                               diapasef_window=diapasef_window)
+                                sys.stdout.write(get_iso8601_timestamp() +
+                                                 ':' +
+                                                 data.source_file.replace('/', '\\') +
+                                                 ':' +
+                                                 suffix +
+                                                 ':Progress:' +
+                                                 str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                                 '%\n')
+                            chunk += chunk_size
+                        else:
+                            chunk_list = []
+                            for i, j in zip(frames[chunk:-1], frames[chunk + 1:]):
+                                chunk_list.append((int(i), int(j)))
+                            chunk_list.append((j, data.analysis['Frames'].shape[0] + 1))
+                            logging.info(get_iso8601_timestamp() +
+                                         ':' +
+                                         'Parsing and writing Frame ' +
+                                         str(chunk_list[0][0]) +
+                                         ' from ' +
+                                         data.analysis['GlobalMetadata']['SampleName'] +
+                                         '...')
+                            for frame_start, frame_stop in chunk_list:
+                                write_maldi_ims_chunk_to_imzml(data,
+                                                               imzml_file,
+                                                               frame_start,
+                                                               frame_stop,
+                                                               mode,
+                                                               exclude_mobility,
+                                                               profile_bins,
+                                                               mz_encoding,
+                                                               intensity_encoding,
+                                                               mobility_encoding,
+                                                               diapasef_window=diapasef_window)
+                                sys.stdout.write(get_iso8601_timestamp() +
+                                                 ':' +
+                                                 data.source_file.replace('/', '\\') +
+                                                 ':' +
+                                                 suffix +
+                                                 ':Progress:100%\n')
+                logging.info(
+                    get_iso8601_timestamp() + ':' + 'Finished writing to .imzML file ' + os.path.join(outdir, outfile) + '...')
 
 
 def write_maldi_iprm_ims_chunk_to_mzml(data, mzml_file, frame_start, frame_stop, scan_count, mode, exclude_mobility,
@@ -1380,115 +1381,224 @@ def write_maldi_iprm_ims_chunk_to_mzml(data, mzml_file, frame_start, frame_stop,
 
 def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobility, profile_bins,
                               mz_encoding, intensity_encoding, mobility_encoding, compression, barebones_metadata,
-                              chunk_size=10):
-    if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
-        if mode == 'profile':
-            exclude_mobility = True
-            logging.info(get_iso8601_timestamp() + ':' + 'Export of ion mobility data is not supported for profile mode data...')
-            logging.info(get_iso8601_timestamp() + ':' + 'Exporting without ion mobility data...')
-        msms_mode_id = data.analysis['PropertyDefinitions'][data.analysis['PropertyDefinitions']['PermanentName'] == 'Mode_ScanMode'].to_dict(orient='records')[0]['Id']
-        properties_dict = data.analysis['Properties'][data.analysis['Properties']['Property'] == msms_mode_id].to_dict(orient='records')
-        if all(i['Value'] == 12 for i in properties_dict):
-            if not data.analysis['DiaFrameMsMsWindows'].empty:
-                writers = {}
-                for index, row in data.analysis['DiaFrameMsMsWindows'].iterrows():
-                    suffix = f"mz{round(row['IsolationMz'])}_ScanNum{round(row['ScanNumBegin'])}-{round(row['ScanNumEnd'])}"
-                    # tuple of MzmlWriter and diapasef_window
-                    writers[suffix] = (MzMLWriter(os.path.join(outdir,
-                                                               f'{os.path.splitext(outfile)[0]}_{suffix}.mzML'),
-                                                  close=True),
-                                       row)
-    for suffix, value in writers.items():
-        writer = value[0]
-        diapasef_window = value[1]
-        with writer:
-            # Begin mzML with controlled vocabularies (CV).
-            logging.info(get_iso8601_timestamp() + ':' + 'Initializing controlled vocabularies...')
-            writer.controlled_vocabularies()
+                              iprm_output_mode, chunk_size=10):
+    if iprm_output_mode == 'individual':
+        if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
+            if mode == 'profile':
+                exclude_mobility = True
+                logging.info(get_iso8601_timestamp() + ':' + 'Export of ion mobility data is not supported for profile mode data...')
+                logging.info(get_iso8601_timestamp() + ':' + 'Exporting without ion mobility data...')
+            msms_mode_id = data.analysis['PropertyDefinitions'][data.analysis['PropertyDefinitions']['PermanentName'] == 'Mode_ScanMode'].to_dict(orient='records')[0]['Id']
+            properties_dict = data.analysis['Properties'][data.analysis['Properties']['Property'] == msms_mode_id].to_dict(orient='records')
+            if all(i['Value'] == 12 for i in properties_dict):
+                if not data.analysis['DiaFrameMsMsWindows'].empty:
+                    writers = {}
+                    for index, row in data.analysis['DiaFrameMsMsWindows'].iterrows():
+                        suffix = f"mz{round(row['IsolationMz'])}_ScanNum{round(row['ScanNumBegin'])}-{round(row['ScanNumEnd'])}"
+                        # tuple of MzmlWriter and diapasef_window
+                        writers[suffix] = (MzMLWriter(os.path.join(outdir,
+                                                                   f'{os.path.splitext(outfile)[0]}_{suffix}.mzML'),
+                                                      close=True),
+                                           row)
+                    for suffix, value in writers.items():
+                        writer = value[0]
+                        diapasef_window = value[1]
+                        with writer:
+                            # Begin mzML with controlled vocabularies (CV).
+                            logging.info(get_iso8601_timestamp() + ':' + 'Initializing controlled vocabularies...')
+                            writer.controlled_vocabularies()
 
-            # Start write acquistiion, instrument config, processing, etc. to mzML.
-            logging.info(get_iso8601_timestamp() + ':' + 'Writing mzML metadata...')
-            write_mzml_metadata(data, writer, infile, mode, ms2_only, barebones_metadata)
+                            # Start write acquistiion, instrument config, processing, etc. to mzML.
+                            logging.info(get_iso8601_timestamp() + ':' + 'Writing mzML metadata...')
+                            write_mzml_metadata(data, writer, infile, mode, ms2_only, barebones_metadata)
 
-            logging.info(get_iso8601_timestamp() + ':' + 'Writing to .mzML file ' + os.path.join(outdir, outfile) + '...')
-            # Parse chunks of data and write to spectrum element.
-            with writer.run(id='run',
-                            instrument_configuration='instrument',
-                            start_time=data.analysis['GlobalMetadata']['AcquisitionDateTime']):
-                scan_count = 0
-                # Count number of spectra in run by counting number of rows in diapasef window table
-                logging.info(get_iso8601_timestamp() + ':' + 'Calculating number of spectra...')
-                num_of_spectra = len(data.analysis['Frames']['Id'].to_list())
-                with writer.spectrum_list(count=num_of_spectra):
-                    chunk = 0
-                    frames = data.analysis['Frames']['Id'].to_list()
-                    # Write data in chunks of chunk_size
-                    while chunk + chunk_size + 1 <= len(frames):
-                        chunk_list = []
-                        for i, j in zip(frames[chunk:chunk + chunk_size], frames[chunk + 1: chunk + chunk_size + 1]):
-                            chunk_list.append((int(i), int(j)))
-                        logging.info(get_iso8601_timestamp() +
-                                     ':' +
-                                     'Parsing and writing Frame ' +
-                                     str(chunk_list[0][0]) +
-                                     ' from ' +
-                                     data.analysis['GlobalMetadata']['SampleName'] +
-                                     '...')
-                        for frame_start, frame_stop in chunk_list:
-                            scan_count = write_maldi_iprm_ims_chunk_to_mzml(data,
-                                                                            writer,
-                                                                            frame_start,
-                                                                            frame_stop,
-                                                                            scan_count,
-                                                                            mode,
-                                                                            exclude_mobility,
-                                                                            profile_bins,
-                                                                            mz_encoding,
-                                                                            intensity_encoding,
-                                                                            mobility_encoding,
-                                                                            compression,
-                                                                            diapasef_window)
-                            sys.stdout.write(get_iso8601_timestamp() +
-                                             ':' +
-                                             data.source_file.replace('/', '\\') +
-                                             ':' +
-                                             suffix +
-                                             ':Progress:' +
-                                             str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
-                                             '%\n')
-                        chunk += chunk_size
-                    # Last chunk may be smaller than chunk_size
-                    else:
-                        chunk_list = []
-                        for i, j in zip(frames[chunk:-1], frames[chunk + 1:]):
-                            chunk_list.append((int(i), int(j)))
-                        chunk_list.append((j, data.analysis['Frames'].shape[0] + 1))
-                        logging.info(get_iso8601_timestamp() +
-                                     ':' +
-                                     'Parsing and writing Frame ' +
-                                     str(chunk_list[0][0]) +
-                                     ' from ' +
-                                     data.analysis['GlobalMetadata']['SampleName'] +
-                                     '...')
-                        for frame_start, frame_stop in chunk_list:
-                            scan_count = write_maldi_iprm_ims_chunk_to_mzml(data,
-                                                                            writer,
-                                                                            frame_start,
-                                                                            frame_stop,
-                                                                            scan_count,
-                                                                            mode,
-                                                                            exclude_mobility,
-                                                                            profile_bins,
-                                                                            mz_encoding,
-                                                                            intensity_encoding,
-                                                                            mobility_encoding,
-                                                                            compression,
-                                                                            diapasef_window)
-                            sys.stdout.write(get_iso8601_timestamp() +
-                                             ':' +
-                                             data.source_file.replace('/', '\\') +
-                                             ':' +
-                                             suffix +
-                                             ':Progress:100%\n')
-        logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mzML file ' +
-                     os.path.join(outdir, outfile) + '...')
+                            logging.info(get_iso8601_timestamp() + ':' + 'Writing to .mzML file ' + os.path.join(outdir, outfile) + '...')
+                            # Parse chunks of data and write to spectrum element.
+                            with writer.run(id='run',
+                                            instrument_configuration='instrument',
+                                            start_time=data.analysis['GlobalMetadata']['AcquisitionDateTime']):
+                                scan_count = 0
+                                # Count number of spectra in run by counting number of rows in Frames table.
+                                logging.info(get_iso8601_timestamp() + ':' + 'Calculating number of spectra...')
+                                num_of_spectra = len(data.analysis['Frames']['Id'].to_list())
+                                with writer.spectrum_list(count=num_of_spectra):
+                                    chunk = 0
+                                    frames = data.analysis['Frames']['Id'].to_list()
+                                    # Write data in chunks of chunk_size.
+                                    while chunk + chunk_size + 1 <= len(frames):
+                                        chunk_list = []
+                                        for i, j in zip(frames[chunk:chunk + chunk_size],
+                                                        frames[chunk + 1: chunk + chunk_size + 1]):
+                                            chunk_list.append((int(i), int(j)))
+                                        logging.info(get_iso8601_timestamp() +
+                                                     ':' +
+                                                     'Parsing and writing Frame ' +
+                                                     str(chunk_list[0][0]) +
+                                                     ' from ' +
+                                                     data.analysis['GlobalMetadata']['SampleName'] +
+                                                     '...')
+                                        for frame_start, frame_stop in chunk_list:
+                                            scan_count = write_maldi_iprm_ims_chunk_to_mzml(data,
+                                                                                            writer,
+                                                                                            frame_start,
+                                                                                            frame_stop,
+                                                                                            scan_count,
+                                                                                            mode,
+                                                                                            exclude_mobility,
+                                                                                            profile_bins,
+                                                                                            mz_encoding,
+                                                                                            intensity_encoding,
+                                                                                            mobility_encoding,
+                                                                                            compression,
+                                                                                            diapasef_window)
+                                            sys.stdout.write(get_iso8601_timestamp() +
+                                                             ':' +
+                                                             data.source_file.replace('/', '\\') +
+                                                             ':' +
+                                                             suffix +
+                                                             ':Progress:' +
+                                                             str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                                             '%\n')
+                                        chunk += chunk_size
+                                    # Last chunk may be smaller than chunk_size.
+                                    else:
+                                        chunk_list = []
+                                        for i, j in zip(frames[chunk:-1], frames[chunk + 1:]):
+                                            chunk_list.append((int(i), int(j)))
+                                        chunk_list.append((j, data.analysis['Frames'].shape[0] + 1))
+                                        logging.info(get_iso8601_timestamp() +
+                                                     ':' +
+                                                     'Parsing and writing Frame ' +
+                                                     str(chunk_list[0][0]) +
+                                                     ' from ' +
+                                                     data.analysis['GlobalMetadata']['SampleName'] +
+                                                     '...')
+                                        for frame_start, frame_stop in chunk_list:
+                                            scan_count = write_maldi_iprm_ims_chunk_to_mzml(data,
+                                                                                            writer,
+                                                                                            frame_start,
+                                                                                            frame_stop,
+                                                                                            scan_count,
+                                                                                            mode,
+                                                                                            exclude_mobility,
+                                                                                            profile_bins,
+                                                                                            mz_encoding,
+                                                                                            intensity_encoding,
+                                                                                            mobility_encoding,
+                                                                                            compression,
+                                                                                            diapasef_window)
+                                            sys.stdout.write(get_iso8601_timestamp() +
+                                                             ':' +
+                                                             data.source_file.replace('/', '\\') +
+                                                             ':' +
+                                                             suffix +
+                                                             ':Progress:100%\n')
+                        logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mzML file ' +
+                                     os.path.join(outdir, outfile) + '...')
+    elif iprm_output_mode == 'combined':
+        if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
+            if mode == 'profile':
+                exclude_mobility = True
+                logging.info(
+                    get_iso8601_timestamp() + ':' + 'Export of ion mobility data is not supported for profile mode data...')
+                logging.info(get_iso8601_timestamp() + ':' + 'Exporting without ion mobility data...')
+            msms_mode_id = data.analysis['PropertyDefinitions'][
+                data.analysis['PropertyDefinitions']['PermanentName'] == 'Mode_ScanMode'].to_dict(orient='records')[0][
+                'Id']
+            properties_dict = data.analysis['Properties'][
+                data.analysis['Properties']['Property'] == msms_mode_id].to_dict(orient='records')
+            if all(i['Value'] == 12 for i in properties_dict):
+                if not data.analysis['DiaFrameMsMsWindows'].empty:
+                    # Initialize psims mzML writer.
+                    writer = MzMLWriter(os.path.join(outdir, f'{os.path.splitext(outfile)[0]}.mzML'), close=True)
+                    with writer:
+                        # Begin mzML with controlled vocabularies (CV).
+                        logging.info(get_iso8601_timestamp() + ':' + 'Initializing controlled vocabularies...')
+                        writer.controlled_vocabularies()
+
+                        # Start write acquistiion, instrument config, processing, etc. to mzML.
+                        logging.info(get_iso8601_timestamp() + ':' + 'Writing mzML metadata...')
+                        write_mzml_metadata(data, writer, infile, mode, ms2_only, barebones_metadata)
+
+                        logging.info(
+                            get_iso8601_timestamp() + ':' + 'Writing to .mzML file ' + os.path.join(outdir, outfile) + '...')
+                        # Parse chunks of data and write to spectrum element.
+                        with writer.run(id='run',
+                                        instrument_configuration='instrument',
+                                        start_time=data.analysis['GlobalMetadata']['AcquisitionDateTime']):
+                            scan_count = 0
+                            # Count number of spectra in run by counting number of rows in Frames table.
+                            logging.info(get_iso8601_timestamp() + ':' + 'Calculating number of spectra...')
+                            num_of_spectra = len(data.analysis['Frames']['Id'].to_list())
+                            with writer.spectrum_list(count=num_of_spectra):
+                                chunk = 0
+                                frames = data.analysis['Frames']['Id'].to_list()
+                                # Write data in chunks of chunk_size.
+                                while chunk + chunk_size + 1 <= len(frames):
+                                    chunk_list = []
+                                    for i, j in zip(frames[chunk:chunk + chunk_size],
+                                                    frames[chunk + 1: chunk + chunk_size + 1]):
+                                        chunk_list.append((int(i), int(j)))
+                                    logging.info(get_iso8601_timestamp() +
+                                                 ':' +
+                                                 'Parsing and writing Frame ' +
+                                                 str(chunk_list[0][0]) +
+                                                 ' from ' +
+                                                 data.analysis['GlobalMetadata']['SampleName'] +
+                                                 '...')
+                                    for frame_start, frame_stop in chunk_list:
+                                        for index, diapasef_window in data.analysis['DiaFrameMsMsWindows'].iterrows():
+                                            scan_count = write_maldi_iprm_ims_chunk_to_mzml(data,
+                                                                                            writer,
+                                                                                            frame_start,
+                                                                                            frame_stop,
+                                                                                            scan_count,
+                                                                                            mode,
+                                                                                            exclude_mobility,
+                                                                                            profile_bins,
+                                                                                            mz_encoding,
+                                                                                            intensity_encoding,
+                                                                                            mobility_encoding,
+                                                                                            compression,
+                                                                                            diapasef_window)
+                                            sys.stdout.write(get_iso8601_timestamp() +
+                                                             ':' +
+                                                             data.source_file.replace('/', '\\') +
+                                                             ':Progress:' +
+                                                             str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                                             '%\n')
+                                    chunk += chunk_size
+                                # Last chunk may be smaller than chunk_size
+                                else:
+                                    chunk_list = []
+                                    for i, j in zip(frames[chunk:-1], frames[chunk + 1]):
+                                        chunk_list.append((int(i), int(j)))
+                                    chunk_list.append((j, data.analysis['Frames'].shape[0] + 1))
+                                    logging.info(get_iso8601_timestamp() +
+                                                 ':' +
+                                                 'Parsing and writing Frame ' +
+                                                 str(chunk_list[0][0]) +
+                                                 ' from ' +
+                                                 data.analysis['GlobalMetadata']['SampleName'] +
+                                                 '...')
+                                    for frame_start, frame_stop in chunk_list:
+                                        for index, diapasef_window in data.analysis['DiaFrameMsMsWindows'].iterrows():
+                                            scan_count = write_maldi_iprm_ims_chunk_to_mzml(data,
+                                                                                            writer,
+                                                                                            frame_start,
+                                                                                            frame_stop,
+                                                                                            scan_count,
+                                                                                            mode,
+                                                                                            exclude_mobility,
+                                                                                            profile_bins,
+                                                                                            mz_encoding,
+                                                                                            intensity_encoding,
+                                                                                            mobility_encoding,
+                                                                                            compression,
+                                                                                            diapasef_window)
+                                            sys.stdout.write(get_iso8601_timestamp() +
+                                                             ':' +
+                                                             data.source_file.replace('/', '\\') +
+                                                             ':Progress:100%\n')
+                    logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mzML file ' +
+                                 os.path.join(outdir, outfile) + '...')
