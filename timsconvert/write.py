@@ -1625,16 +1625,15 @@ def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exc
                                  os.path.join(outdir, outfile) + '...')
 
 
-def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, profile_bins, mz_encoding,
-                             intensity_encoding, mobility_encoding, iprm_output_mode, chunk_size=10, gui=False):
+def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, profile_bins, mz_encoding, intensity_encoding,
+                             mobility_encoding, iprm_output_mode, chunk_size=10, gui=False):
     # TODO: set exclude mobility to True for mgf output
     if iprm_output_mode == 'individual':
         if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
-            if mode == 'profile':
-                exclude_mobility = True
-                logging.info(
-                    get_iso8601_timestamp() + ':' + 'Export of ion mobility data is not supported for profile mode data...')
-                logging.info(get_iso8601_timestamp() + ':' + 'Exporting without ion mobility data...')
+            exclude_mobility = True
+            logging.info(
+                get_iso8601_timestamp() + ':' + 'Export of ion mobility data is not supported for MGF files...')
+            logging.info(get_iso8601_timestamp() + ':' + 'Exporting without ion mobility data...')
             msms_mode_id = data.analysis['PropertyDefinitions'][
                 data.analysis['PropertyDefinitions']['PermanentName'] == 'Mode_ScanMode'].to_dict(orient='records')[0][
                 'Id']
