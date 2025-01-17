@@ -1415,11 +1415,8 @@ def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exc
                     for index, row in data.analysis['DiaFrameMsMsWindows'].iterrows():
                         suffix = f"mz{round(row['IsolationMz'])}_ScanNum{round(row['ScanNumBegin'])}-{round(row['ScanNumEnd'])}"
                         # tuple of MzmlWriter and diapasef_window
-                        # TODO: update outfile with path in line 1419
-                        writers[suffix] = (MzMLWriter(os.path.join(outdir,
-                                                                   f'{os.path.splitext(outfile)[0]}_{suffix}.mzML'),
-                                                      close=True),
-                                           row)
+                        outfile = f'{os.path.splitext(outfile)[0]}_{suffix}.mzML'
+                        writers[suffix] = (MzMLWriter(os.path.join(outdir, outfile), close=True), row)
                     for suffix, value in writers.items():
                         writer = value[0]
                         diapasef_window = value[1]
@@ -1649,8 +1646,8 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                     for index, row in data.analysis['DiaFrameMsMsWindows'].iterrows():
                         suffix = f"mz{round(row['IsolationMz'])}_ScanNum{round(row['ScanNumBegin'])}-{round(row['ScanNumEnd'])}"
                         # tuple of mgf filename and diapasef_window
-                        writers[suffix] = (os.path.join(outdir, f'{os.path.splitext(outfile)[0]}_{suffix}.mgf'),
-                                           row)
+                        outfile = f'{os.path.splitext(outfile)[0]}_{suffix}.mgf'
+                        writers[suffix] = (os.path.join(outdir, outfile), row)
                     for suffix, value in writers.items():
                         mgf_filename = value[0]
                         diapasef_window = value[1]
