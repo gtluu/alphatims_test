@@ -282,7 +282,7 @@ class TimsconvertGuiWindow(QMainWindow, Ui_TimsconvertGuiWindow):
                         logging.info(get_iso8601_timestamp() + ':' + 'Skipping...')
 
             # Convert each sample.
-            list_of_logfiles = [convert_raw_file((self.args, infile)) for infile in input_files]
+            list_of_logfiles = [convert_raw_file((self.args, infile), gui=True) for infile in input_files]
             """with Pool(processes=cpu_count() - 1) as pool:
                 pool_map_input = [(self.args, infile) for infile in input_files]
                 list_of_logfiles = pool.map(convert_raw_file, pool_map_input)

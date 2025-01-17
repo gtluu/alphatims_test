@@ -3,18 +3,13 @@ import sys
 import io
 import re
 import logging
-#from multiprocess import Pool, cpu_count, freeze_support
 from timsconvert.data_input import dot_d_detection
 from timsconvert.timestamp import get_timestamp, get_iso8601_timestamp
 from timsconvert.convert import convert_raw_file, clean_up_logfiles
 from timsconvert.constants import VERSION
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale, QMetaObject, QObject, QPoint, QRect, QSize,
-                            QTime, QUrl, Qt, QTimer, QProcess)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont, QFontDatabase, QGradient, QIcon, QImage,
-                           QKeySequence, QLinearGradient, QPainter, QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QLabel, QLineEdit, QListView, QMainWindow, QPushButton,
-                               QRadioButton, QSizePolicy, QSpinBox, QWidget, QFileDialog, QProgressBar, QDialog,
-                               QDialogButtonBox, QVBoxLayout, QMessageBox, QTableWidgetItem)
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (QApplication, QMainWindow, QFileDialog, QProgressBar, QMessageBox, QTableWidgetItem)
 from timsconvert.timsconvert_gui_template import Ui_TimsconvertGuiWindow
 
 
@@ -64,7 +59,7 @@ class TimsconvertGuiWindow(QMainWindow, Ui_TimsconvertGuiWindow):
                      'mobility_encoding': 64,  # QRadioButton
                      'barebones_metadata': False,  # QCheckbox
                      'profile_bins': 0,  # QLineEdit
-                     'maldi_output_file': 'combined',  # QRadioButton
+                     'maldi_output_mode': 'combined',  # QRadioButton
                      'maldi_plate_map': '',  # QLineEdit + QPushButton (select file dialogue button)
                      'imzml_mode': 'processed',  # QRadioButton
                      'verbose': False}  # QCheckbox
@@ -245,18 +240,18 @@ class TimsconvertGuiWindow(QMainWindow, Ui_TimsconvertGuiWindow):
             self.args['profile_bins'] = int(self.NumBinsSpinBox.text())
         else:
             self.args['profile_bins'] = 0
-        if (self.MaldiOutputFileCombinedRadio.isChecked() and
-                not self.MaldiOutputFileIndividualRadio.isChecked() and
-                not self.MaldiOutputFileSampleRadio.isChecked()):
-            self.args['maldi_output_file'] = 'combined'
-        elif (not self.MaldiOutputFileCombinedRadio.isChecked() and
-              self.MaldiOutputFileIndividualRadio.isChecked() and
-              not self.MaldiOutputFileSampleRadio.isChecked()):
-            self.args['maldi_output_file'] = 'individual'
-        elif (not self.MaldiOutputFileCombinedRadio.isChecked() and
-              not self.MaldiOutputFileIndividualRadio.isChecked() and
-              self.MaldiOutputFileSampleRadio.isChecked()):
-            self.args['maldi_output_file'] = 'sample'
+        if (self.MaldiOutputModeCombinedRadio.isChecked() and
+                not self.MaldiOutputModeIndividualRadio.isChecked() and
+                not self.MaldiOutputModeSampleRadio.isChecked()):
+            self.args['maldi_output_mode'] = 'combined'
+        elif (not self.MaldiOutputModeCombinedRadio.isChecked() and
+              self.MaldiOutputModeIndividualRadio.isChecked() and
+              not self.MaldiOutputModeSampleRadio.isChecked()):
+            self.args['maldi_output_mode'] = 'individual'
+        elif (not self.MaldiOutputModeCombinedRadio.isChecked() and
+              not self.MaldiOutputModeIndividualRadio.isChecked() and
+              self.MaldiOutputModeSampleRadio.isChecked()):
+            self.args['maldi_output_mode'] = 'sample'
         self.args['maldi_plate_map'] = str(self.MaldiPlateMapLine.text())
         if self.MaldiImzmlModeProcessedRadio.isChecked() and not self.MaldiImzmlModeContinuousRadio.isChecked():
             self.args['imzml_mode'] = 'processed'
@@ -351,8 +346,6 @@ class TimsconvertGuiWindow(QMainWindow, Ui_TimsconvertGuiWindow):
 
 
 def main():
-    #freeze_support()
-
     app = QApplication([])
 
     window = TimsconvertGuiWindow()

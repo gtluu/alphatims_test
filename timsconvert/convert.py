@@ -11,7 +11,7 @@ from pyTDFSDK.ctypes_data_structures import PressureCompensationStrategy
 from pyBaf2Sql.init_baf2sql import init_baf2sql_api
 
 
-def convert_raw_file(tuple_args):
+def convert_raw_file(tuple_args, gui=False):
     run_args = tuple_args[0]
     infile = tuple_args[1]
     # Set output directory to default if not specified.

@@ -1,4 +1,11 @@
-from timsconvert import *
+import os
+import logging
+from multiprocessing import Pool, cpu_count
+from timsconvert.arguments import get_args, args_check
+from timsconvert.constants import VERSION
+from timsconvert.data_input import dot_d_detection
+from timsconvert.timestamp import get_iso8601_timestamp
+from timsconvert.convert import convert_raw_file, clean_up_logfiles
 
 
 def main():
@@ -16,7 +23,7 @@ def main():
             input_files = input_files + list(filter(None, dot_d_detection(dirpath)))
         elif dirpath.endswith('.d'):
             if os.path.isdir(dirpath):
-                input_files = input_files +[dirpath]
+                input_files = input_files + [dirpath]
             else:
                 logging.info(get_iso8601_timestamp() + ':' + f'{dirpath} does not exist...')
                 logging.info(get_iso8601_timestamp() + ':' + 'Skipping...')

@@ -481,7 +481,7 @@ def write_lcms_chunk_to_mzml(data, writer, frame_start, frame_stop, scan_count, 
 
 
 def write_lcms_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobility, profile_bins, mz_encoding,
-                    intensity_encoding, mobility_encoding, compression, barebones_metadata, chunk_size=10):
+                    intensity_encoding, mobility_encoding, compression, barebones_metadata, chunk_size=10, gui=False):
     """
     Parse and write out spectra to an mzML file from an LC-MS(/MS) dataset using psims.
 
@@ -519,6 +519,8 @@ def write_lcms_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobil
         timsconvert.write.write_lcms_chunk_to_mzml() for memory efficiency; larger chunk_size requires more memory
         during conversion.
     :type chunk_size: int
+    :param gui: Whether function is running from GUI or command line. Toggles sys.stdout messages.
+    :type gui: bool
     """
     if isinstance(data, TimsconvertBafData):
         frames_key = 'Spectra'
@@ -579,12 +581,13 @@ def write_lcms_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobil
                                                               intensity_encoding,
                                                               mobility_encoding,
                                                               compression)
-                        sys.stdout.write(get_iso8601_timestamp() +
-                                         ':' +
-                                         data.source_file.replace('/', '\\') +
-                                         ':Progress:' +
-                                         str(round((frame_start / data.analysis[frames_key].shape[0]) * 100)) +
-                                         '%\n')
+                        if gui:
+                            sys.stdout.write(get_iso8601_timestamp() +
+                                             ':' +
+                                             data.source_file.replace('/', '\\') +
+                                             ':Progress:' +
+                                             str(round((frame_start / data.analysis[frames_key].shape[0]) * 100)) +
+                                             '%\n')
                     chunk += chunk_size
                 # Last chunk may be smaller than chunk_size
                 else:
@@ -613,10 +616,11 @@ def write_lcms_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobil
                                                               intensity_encoding,
                                                               mobility_encoding,
                                                               compression)
-                        sys.stdout.write(get_iso8601_timestamp() +
-                                         ':' +
-                                         data.source_file.replace('/', '\\') +
-                                         ':Progress:100%\n')
+                        if gui:
+                            sys.stdout.write(get_iso8601_timestamp() +
+                                             ':' +
+                                             data.source_file.replace('/', '\\') +
+                                             ':Progress:100%\n')
 
     if num_of_spectra != scan_count:
         logging.info(get_iso8601_timestamp() + ':' + 'Updating scan count...')
@@ -632,7 +636,7 @@ def write_lcms_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobil
 
 def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobility, profile_bins, mz_encoding,
                         intensity_encoding, mobility_encoding, compression, maldi_output_mode, plate_map,
-                        barebones_metadata):
+                        barebones_metadata, gui=False):
     """
     Parse and write out spectra to an mzML file from a MALDI-MS(/MS) dried droplet dataset using psims.
 
@@ -671,6 +675,8 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
         for compatibility with downstream analysis software that does not have support for newer CV params or
         UserParams.
     :type barebones_metadata: bool
+    :param gui: Whether function is running from GUI or command line. Toggles sys.stdout messages.
+    :type gui: bool
     """
     if isinstance(data, TimsconvertBafData):
         frames_key = 'Spectra'
@@ -757,12 +763,13 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
                                                    mobility_encoding,
                                                    compression,
                                                    title=os.path.splitext(outfile)[0])
-                            sys.stdout.write(get_iso8601_timestamp() +
-                                             ':' +
-                                             data.source_file.replace('/', '\\') +
-                                             ':Progress:' +
-                                             str(round((scan_count / len(list_of_scans)) * 100)) +
-                                             '%\n')
+                            if gui:
+                                sys.stdout.write(get_iso8601_timestamp() +
+                                                 ':' +
+                                                 data.source_file.replace('/', '\\') +
+                                                 ':Progress:' +
+                                                 str(round((scan_count / len(list_of_scans)) * 100)) +
+                                                 '%\n')
 
         logging.info(get_iso8601_timestamp() + ':' + 'Updating scan count...')
         update_spectra_count(outdir, outfile, num_of_spectra, scan_count)
@@ -848,12 +855,13 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
                                                        title=plate_map_dict[scan.coord])
                 logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mzML file ' +
                              os.path.join(outdir, output_filename) + '...')
-                sys.stdout.write(get_iso8601_timestamp() +
-                                 ':' +
-                                 data.source_file.replace('/', '\\') +
-                                 ':Progress:' +
-                                 str(round((progress_counter / len(list_of_scans)) * 100)) +
-                                 '%\n')
+                if gui:
+                    sys.stdout.write(get_iso8601_timestamp() +
+                                     ':' +
+                                     data.source_file.replace('/', '\\') +
+                                     ':Progress:' +
+                                     str(round((progress_counter / len(list_of_scans)) * 100)) +
+                                     '%\n')
 
     # Group spectra from a given TSF or TDF file by sample name based on user provided plate map.
     elif maldi_output_mode == 'sample' and plate_map != '':
@@ -950,12 +958,13 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
 
                     logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mzML file ' +
                                  os.path.join(outdir, outfile) + '...')
-                    sys.stdout.write(get_iso8601_timestamp() +
-                                     ':' +
-                                     data.source_file.replace('/', '\\') +
-                                     ':Progress:' +
-                                     str(round((progress_counter / len(dict_of_scan_lists)) * 100)) +
-                                     '%\n')
+                    if gui:
+                        sys.stdout.write(get_iso8601_timestamp() +
+                                         ':' +
+                                         data.source_file.replace('/', '\\') +
+                                         ':Progress:' +
+                                         str(round((progress_counter / len(dict_of_scan_lists)) * 100)) +
+                                         '%\n')
 
 
 def write_maldi_ims_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mode, exclude_mobility, profile_bins,
@@ -1038,7 +1047,7 @@ def write_maldi_ims_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mo
 
 
 def write_maldi_ims_imzml(data, outdir, outfile, mode, exclude_mobility, profile_bins, imzml_mode, mz_encoding,
-                          intensity_encoding, mobility_encoding, compression, chunk_size=10):
+                          intensity_encoding, mobility_encoding, compression, chunk_size=10, gui=False):
     """
     Parse and write out spectra to an imzML file from a MALDI-MS(/MS) MSI dataset using pyimzML.
 
@@ -1070,6 +1079,8 @@ def write_maldi_ims_imzml(data, outdir, outfile, mode, exclude_mobility, profile
         timsconvert.write.write_lcms_chunk_to_mzml() for memory efficiency; larger chunk_size requires more memory
         during conversion.
     :type chunk_size: int
+    :param gui: Whether function is running from GUI or command line. Toggles sys.stdout messages.
+    :type gui: bool
     """
     # Set polarity for run in imzML.
     polarity = list(set(data.analysis['Frames']['Polarity'].values.tolist()))
@@ -1155,12 +1166,13 @@ def write_maldi_ims_imzml(data, outdir, outfile, mode, exclude_mobility, profile
                                                mz_encoding,
                                                intensity_encoding,
                                                mobility_encoding)
-                sys.stdout.write(get_iso8601_timestamp() +
-                                 ':' +
-                                 data.source_file.replace('/', '\\') +
-                                 ':Progress:' +
-                                 str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
-                                 '%\n')
+                if gui:
+                    sys.stdout.write(get_iso8601_timestamp() +
+                                     ':' +
+                                     data.source_file.replace('/', '\\') +
+                                     ':Progress:' +
+                                     str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                     '%\n')
             chunk += chunk_size
         else:
             chunk_list = []
@@ -1185,16 +1197,17 @@ def write_maldi_ims_imzml(data, outdir, outfile, mode, exclude_mobility, profile
                                                mz_encoding,
                                                intensity_encoding,
                                                mobility_encoding)
-                sys.stdout.write(get_iso8601_timestamp() +
-                                 ':' +
-                                 data.source_file.replace('/', '\\') +
-                                 ':Progress:100%\n')
+                if gui:
+                    sys.stdout.write(get_iso8601_timestamp() +
+                                     ':' +
+                                     data.source_file.replace('/', '\\') +
+                                     ':Progress:100%\n')
     logging.info(
         get_iso8601_timestamp() + ':' + 'Finished writing to .imzML file ' + os.path.join(outdir, outfile) + '...')
 
 
 def write_maldi_ims_iprm_imzml(data, outdir, outfile, mode, exclude_mobility, profile_bins, imzml_mode, mz_encoding,
-                               intensity_encoding, mobility_encoding, compression, chunk_size=10):
+                               intensity_encoding, mobility_encoding, compression, chunk_size=10, gui=False):
     """
     Parse and write out spectra to an imzML file from a MALDI-MS(/MS) MSI dataset using pyimzML.
 
@@ -1226,6 +1239,8 @@ def write_maldi_ims_iprm_imzml(data, outdir, outfile, mode, exclude_mobility, pr
         timsconvert.write.write_lcms_chunk_to_mzml() for memory efficiency; larger chunk_size requires more memory
         during conversion.
     :type chunk_size: int
+    :param gui: Whether function is running from GUI or command line. Toggles sys.stdout messages.
+    :type gui: bool
     """
     # Set polarity for run in imzML.
     polarity = list(set(data.analysis['Frames']['Polarity'].values.tolist()))
@@ -1316,14 +1331,15 @@ def write_maldi_ims_iprm_imzml(data, outdir, outfile, mode, exclude_mobility, pr
                                                                intensity_encoding,
                                                                mobility_encoding,
                                                                diapasef_window=diapasef_window)
-                                sys.stdout.write(get_iso8601_timestamp() +
-                                                 ':' +
-                                                 data.source_file.replace('/', '\\') +
-                                                 ':' +
-                                                 suffix +
-                                                 ':Progress:' +
-                                                 str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
-                                                 '%\n')
+                                if gui:
+                                    sys.stdout.write(get_iso8601_timestamp() +
+                                                     ':' +
+                                                     data.source_file.replace('/', '\\') +
+                                                     ':' +
+                                                     suffix +
+                                                     ':Progress:' +
+                                                     str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                                     '%\n')
                             chunk += chunk_size
                         else:
                             chunk_list = []
@@ -1349,12 +1365,13 @@ def write_maldi_ims_iprm_imzml(data, outdir, outfile, mode, exclude_mobility, pr
                                                                intensity_encoding,
                                                                mobility_encoding,
                                                                diapasef_window=diapasef_window)
-                                sys.stdout.write(get_iso8601_timestamp() +
-                                                 ':' +
-                                                 data.source_file.replace('/', '\\') +
-                                                 ':' +
-                                                 suffix +
-                                                 ':Progress:100%\n')
+                                if gui:
+                                    sys.stdout.write(get_iso8601_timestamp() +
+                                                     ':' +
+                                                     data.source_file.replace('/', '\\') +
+                                                     ':' +
+                                                     suffix +
+                                                     ':Progress:100%\n')
                 logging.info(
                     get_iso8601_timestamp() + ':' + 'Finished writing to .imzML file ' + os.path.join(outdir, outfile) + '...')
 
@@ -1383,7 +1400,7 @@ def write_maldi_iprm_ims_chunk_to_mzml(data, mzml_file, frame_start, frame_stop,
 
 def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_mobility, profile_bins,
                               mz_encoding, intensity_encoding, mobility_encoding, compression, barebones_metadata,
-                              iprm_output_mode, chunk_size=10):
+                              iprm_output_mode, chunk_size=10, gui=False):
     if iprm_output_mode == 'individual':
         if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
             if mode == 'profile':
@@ -1453,14 +1470,15 @@ def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exc
                                                                                             mobility_encoding,
                                                                                             compression,
                                                                                             diapasef_window)
-                                            sys.stdout.write(get_iso8601_timestamp() +
-                                                             ':' +
-                                                             data.source_file.replace('/', '\\') +
-                                                             ':' +
-                                                             suffix +
-                                                             ':Progress:' +
-                                                             str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
-                                                             '%\n')
+                                            if gui:
+                                                sys.stdout.write(get_iso8601_timestamp() +
+                                                                 ':' +
+                                                                 data.source_file.replace('/', '\\') +
+                                                                 ':' +
+                                                                 suffix +
+                                                                 ':Progress:' +
+                                                                 str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                                                 '%\n')
                                         chunk += chunk_size
                                     # Last chunk may be smaller than chunk_size.
                                     else:
@@ -1489,12 +1507,13 @@ def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exc
                                                                                             mobility_encoding,
                                                                                             compression,
                                                                                             diapasef_window)
-                                            sys.stdout.write(get_iso8601_timestamp() +
-                                                             ':' +
-                                                             data.source_file.replace('/', '\\') +
-                                                             ':' +
-                                                             suffix +
-                                                             ':Progress:100%\n')
+                                            if gui:
+                                                sys.stdout.write(get_iso8601_timestamp() +
+                                                                 ':' +
+                                                                 data.source_file.replace('/', '\\') +
+                                                                 ':' +
+                                                                 suffix +
+                                                                 ':Progress:100%\n')
                         logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mzML file ' +
                                      os.path.join(outdir, outfile) + '...')
     elif iprm_output_mode == 'combined':
@@ -1563,17 +1582,18 @@ def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exc
                                                                                             mobility_encoding,
                                                                                             compression,
                                                                                             diapasef_window)
-                                            sys.stdout.write(get_iso8601_timestamp() +
-                                                             ':' +
-                                                             data.source_file.replace('/', '\\') +
-                                                             ':Progress:' +
-                                                             str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
-                                                             '%\n')
+                                            if gui:
+                                                sys.stdout.write(get_iso8601_timestamp() +
+                                                                 ':' +
+                                                                 data.source_file.replace('/', '\\') +
+                                                                 ':Progress:' +
+                                                                 str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                                                 '%\n')
                                     chunk += chunk_size
                                 # Last chunk may be smaller than chunk_size
                                 else:
                                     chunk_list = []
-                                    for i, j in zip(frames[chunk:-1], frames[chunk + 1]):
+                                    for i, j in zip(frames[chunk:-1], frames[chunk + 1:]):
                                         chunk_list.append((int(i), int(j)))
                                     chunk_list.append((j, data.analysis['Frames'].shape[0] + 1))
                                     logging.info(get_iso8601_timestamp() +
@@ -1598,16 +1618,17 @@ def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exc
                                                                                             mobility_encoding,
                                                                                             compression,
                                                                                             diapasef_window)
-                                            sys.stdout.write(get_iso8601_timestamp() +
-                                                             ':' +
-                                                             data.source_file.replace('/', '\\') +
-                                                             ':Progress:100%\n')
+                                            if gui:
+                                                sys.stdout.write(get_iso8601_timestamp() +
+                                                                 ':' +
+                                                                 data.source_file.replace('/', '\\') +
+                                                                 ':Progress:100%\n')
                     logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mzML file ' +
                                  os.path.join(outdir, outfile) + '...')
 
 
 def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, profile_bins, mz_encoding,
-                             intensity_encoding, mobility_encoding, iprm_output_mode, chunk_size=10):
+                             intensity_encoding, mobility_encoding, iprm_output_mode, chunk_size=10, gui=False):
     if iprm_output_mode == 'individual':
         if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
             if mode == 'profile':
@@ -1672,14 +1693,15 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                                                              'MSLEVEL': 2}}
                                                  for scan in list_of_scans]
                                 mgf.write(ms2_dict_list, output=mgf_filename, file_mode=mgf_file_mode)
-                                sys.stdout.write(get_iso8601_timestamp() +
-                                                 ':' +
-                                                 data.source_file.replace('/', '\\') +
-                                                 ':' +
-                                                 suffix +
-                                                 ':Progress:' +
-                                                 str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
-                                                 '%\n')
+                                if gui:
+                                    sys.stdout.write(get_iso8601_timestamp() +
+                                                     ':' +
+                                                     data.source_file.replace('/', '\\') +
+                                                     ':' +
+                                                     suffix +
+                                                     ':Progress:' +
+                                                     str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                                     '%\n')
                             chunk += chunk_size
                         # Last chunk may be smaller than chunk_size.
                         else:
@@ -1715,12 +1737,13 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                                                              'MSLEVEL': 2}}
                                                  for scan in list_of_scans]
                                 mgf.write(ms2_dict_list, output=mgf_filename, file_mode=mgf_file_mode)
-                                sys.stdout.write(get_iso8601_timestamp() +
-                                                 ':' +
-                                                 data.source_file.replace('/', '\\') +
-                                                 ':' +
-                                                 suffix +
-                                                 ':Progress:100%\n')
+                                if gui:
+                                    sys.stdout.write(get_iso8601_timestamp() +
+                                                     ':' +
+                                                     data.source_file.replace('/', '\\') +
+                                                     ':' +
+                                                     suffix +
+                                                     ':Progress:100%\n')
                         logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mgf file ' +
                                      os.path.join(outdir, outfile) + '...')
     elif iprm_output_mode == 'combined':
@@ -1780,12 +1803,13 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                                                              'MSLEVEL': 2}}
                                                  for scan in list_of_scans]
                                 mgf.write(ms2_dict_list, output=mgf_filename, file_mode=mgf_file_mode)
-                                sys.stdout.write(get_iso8601_timestamp() +
-                                                 ':' +
-                                                 data.source_file.replace('/', '\\') +
-                                                 ':Progress:' +
-                                                 str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
-                                                 '%\n')
+                                if gui:
+                                    sys.stdout.write(get_iso8601_timestamp() +
+                                                     ':' +
+                                                     data.source_file.replace('/', '\\') +
+                                                     ':Progress:' +
+                                                     str(round((frame_start / data.analysis['Frames'].shape[0]) * 100)) +
+                                                     '%\n')
                         chunk += chunk_size
                     # Last chunk may be smaller than chunk_size.
                     else:
@@ -1822,9 +1846,10 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                                                              'MSLEVEL': 2}}
                                                  for scan in list_of_scans]
                                 mgf.write(ms2_dict_list, output=mgf_filename, file_mode=mgf_file_mode)
-                                sys.stdout.write(get_iso8601_timestamp() +
-                                                 ':' +
-                                                 data.source_file.replace('/', '\\') +
-                                                 ':Progress:100%\n')
+                                if gui:
+                                    sys.stdout.write(get_iso8601_timestamp() +
+                                                     ':' +
+                                                     data.source_file.replace('/', '\\') +
+                                                     ':Progress:100%\n')
                     logging.info(get_iso8601_timestamp() + ':' + 'Finished writing to .mgf file ' +
                                  os.path.join(outdir, outfile) + '...')
