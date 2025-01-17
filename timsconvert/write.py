@@ -90,7 +90,7 @@ def write_mzml_metadata(data, writer, infile, mode, ms2_only, barebones_metadata
                             'version': '2.21.0.4',
                             'params': ['Bruker software']}
         psims_software = {'id': 'psims-writer',
-                          'version': '1.2.7',
+                          'version': '1.3.4',
                           'params': ['python-psims', ]}
         timsconvert_software = {'id': 'timsconvert',
                                 'version': VERSION,
@@ -1415,6 +1415,7 @@ def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exc
                     for index, row in data.analysis['DiaFrameMsMsWindows'].iterrows():
                         suffix = f"mz{round(row['IsolationMz'])}_ScanNum{round(row['ScanNumBegin'])}-{round(row['ScanNumEnd'])}"
                         # tuple of MzmlWriter and diapasef_window
+                        # TODO: update outfile with path in line 1419
                         writers[suffix] = (MzMLWriter(os.path.join(outdir,
                                                                    f'{os.path.splitext(outfile)[0]}_{suffix}.mzML'),
                                                       close=True),
@@ -1629,6 +1630,7 @@ def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exc
 
 def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, profile_bins, mz_encoding,
                              intensity_encoding, mobility_encoding, iprm_output_mode, chunk_size=10, gui=False):
+    # TODO: set exclude mobility to True for mgf output
     if iprm_output_mode == 'individual':
         if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
             if mode == 'profile':
@@ -1654,10 +1656,6 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                         diapasef_window = value[1]
                         scan_count = 0
                         chunk = 0
-                        if chunk == 0:
-                            mgf_file_mode = 'w'
-                        else:
-                            mgf_file_mode = 'a'
                         frames = data.analysis['Frames']['Id'].to_list()
                         # Write data in chunks of chunk_size.
                         while chunk + chunk_size + 1 <= len(frames):
@@ -1684,6 +1682,10 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                                                                      intensity_encoding,
                                                                      mobility_encoding,
                                                                      diapasef_window=diapasef_window)
+                                if scan_count == 0:
+                                    mgf_file_mode = 'w'
+                                else:
+                                    mgf_file_mode = 'a'
                                 scan_count += 1
                                 ms2_dict_list = [{'m/z array': copy.deepcopy(scan.mz_array),
                                                   'intensity array': copy.deepcopy(scan.intensity_array),
@@ -1728,6 +1730,10 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                                                                      intensity_encoding,
                                                                      mobility_encoding,
                                                                      diapasef_window=diapasef_window)
+                                if scan_count == 0:
+                                    mgf_file_mode = 'w'
+                                else:
+                                    mgf_file_mode = 'a'
                                 scan_count += 1
                                 ms2_dict_list = [{'m/z array': copy.deepcopy(scan.mz_array),
                                                   'intensity array': copy.deepcopy(scan.intensity_array),
@@ -1763,10 +1769,6 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                     mgf_filename = os.path.join(outdir, f'{os.path.splitext(outfile)[0]}.mgf')
                     scan_count = 0
                     chunk = 0
-                    if chunk == 0:
-                        mgf_file_mode = 'w'
-                    else:
-                        mgf_file_mode = 'a'
                     frames = data.analysis['Frames']['Id'].to_list()
                     # Write data in chunks of chunk_size.
                     while chunk + chunk_size + 1 <= len(frames):
@@ -1794,6 +1796,10 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                                                                      intensity_encoding,
                                                                      mobility_encoding,
                                                                      diapasef_window=diapasef_window)
+                                if scan_count == 0:
+                                    mgf_file_mode = 'w'
+                                else:
+                                    mgf_file_mode = 'a'
                                 scan_count += 1
                                 ms2_dict_list = [{'m/z array': copy.deepcopy(scan.mz_array),
                                                   'intensity array': copy.deepcopy(scan.intensity_array),
@@ -1837,6 +1843,10 @@ def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, exclude_mobility, prof
                                                                      intensity_encoding,
                                                                      mobility_encoding,
                                                                      diapasef_window=diapasef_window)
+                                if scan_count == 0:
+                                    mgf_file_mode = 'w'
+                                else:
+                                    mgf_file_mode = 'a'
                                 scan_count += 1
                                 ms2_dict_list = [{'m/z array': copy.deepcopy(scan.mz_array),
                                                   'intensity array': copy.deepcopy(scan.intensity_array),
