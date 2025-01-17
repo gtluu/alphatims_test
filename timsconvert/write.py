@@ -1627,7 +1627,6 @@ def write_maldi_ims_iprm_mzml(data, infile, outdir, outfile, mode, ms2_only, exc
 
 def write_maldi_ims_iprm_mgf(data, outdir, outfile, mode, profile_bins, mz_encoding, intensity_encoding,
                              mobility_encoding, iprm_output_mode, chunk_size=10, gui=False):
-    # TODO: set exclude mobility to True for mgf output
     if iprm_output_mode == 'individual':
         if data.analysis['GlobalMetadata']['SchemaType'] == 'TDF':
             exclude_mobility = True
