@@ -13,8 +13,8 @@ def dot_d_detection(input_directory):
     :rtype: list
     """
     if not os.path.exists(input_directory):
-        logging.info(get_iso8601_timestamp() + ':' + f'{input_directory} does not exist...')
-        logging.info(get_iso8601_timestamp() + ':' + 'Skipping...')
+        logging.warning(get_iso8601_timestamp() + ':' + f'{input_directory} does not exist...')
+        logging.warning(get_iso8601_timestamp() + ':' + 'Skipping current file conversion...')
     else:
         return [os.path.join(dirpath, directory) for dirpath, dirnames, filenames in os.walk(input_directory)
                 for directory in dirnames if directory.endswith('.d')]
@@ -49,19 +49,31 @@ def check_for_multiple_analysis(bruker_dot_d_file):
     fnames = [fname for dirpath, dirnames, filenames in os.walk(bruker_dot_d_file) for fname in filenames
               if fname in ['analysis.baf', 'analysis.tsf', 'analysis.tdf', 'analysis.tsf_bin', 'analysis.tdf_bin']]
     if len(fnames) != len(set(fnames)):
-        logging.warning(get_iso8601_timestamp() + ':' + 'Duplicate analysis file detected within .d directory...')
-        logging.warning(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + bruker_dot_d_file + '...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Duplicate analysis file detected within .d directory...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Check the *.d directory for duplicate analysis.sqlite, '
+                                                      'analysis.baf, analysis.tsf, analysis.tsf_bin, analysis.tdf, '
+                                                      'or analysis.tdf_bin files...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + bruker_dot_d_file + '...')
         return True
     if 'analysis.tdf' in fnames and 'analysis.tsf' in fnames:
-        logging.warning(get_iso8601_timestamp() + ':' + 'Duplicate analysis file detected within .d directory...')
-        logging.warning(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + bruker_dot_d_file + '...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Duplicate analysis file detected within .d directory...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Check the *.d directory for duplicate analysis.sqlite, '
+                                                      'analysis.baf, analysis.tsf, analysis.tsf_bin, analysis.tdf, '
+                                                      'or analysis.tdf_bin files...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + bruker_dot_d_file + '...')
         return True
     if 'analysis.tdf' in fnames and 'analysis.baf' in fnames:
-        logging.warning(get_iso8601_timestamp() + ':' + 'Duplicate analysis file detected within .d directory...')
-        logging.warning(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + bruker_dot_d_file + '...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Duplicate analysis file detected within .d directory...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Check the *.d directory for duplicate analysis.sqlite, '
+                                                      'analysis.baf, analysis.tsf, analysis.tsf_bin, analysis.tdf, '
+                                                      'or analysis.tdf_bin files...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + bruker_dot_d_file + '...')
         return True
     if 'analysis.tsf' in fnames and 'analysis.baf' in fnames:
-        logging.warning(get_iso8601_timestamp() + ':' + 'Duplicate analysis file detected within .d directory...')
-        logging.warning(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + bruker_dot_d_file + '...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Duplicate analysis file detected within .d directory...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Check the *.d directory for duplicate analysis.sqlite, '
+                                                      'analysis.baf, analysis.tsf, analysis.tsf_bin, analysis.tdf, '
+                                                      'or analysis.tdf_bin files...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + bruker_dot_d_file + '...')
         return True
     return False

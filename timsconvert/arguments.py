@@ -85,7 +85,7 @@ def get_args():
                           help=arg_descriptions['maldi_output_mode'],
                           default='combined',
                           type=str,
-                          choices=['combined', 'individual', 'sample'])  # TODO: refactor 'sample' to 'group'
+                          choices=['combined', 'individual', 'group'])  # TODO: refactor 'sample' to 'group'
     optional.add_argument('--maldi_plate_map',
                           help=arg_descriptions['maldi_plate_map'],
                           default='',
@@ -127,17 +127,21 @@ def args_check(args):
     """
     # Check if output directory exists and create it if it does not.
     if not os.path.isdir(args['outdir']) and args['outdir'] != '':
-        os.makedirs(args['outdir'])
+        try:
+            os.makedirs(args['outdir'])
+        except OSError:
+            sys.stderr.write(get_iso8601_timestamp() + ':' + 'Output directory could not be created...')
+            sys.exit(1)
     # Check if plate map path is valid and if plate map is available if --maldi_single_file is True.
     if args['maldi_output_mode'] != '' \
             and args['maldi_output_mode'] in ['individual', 'sample'] \
             and args['maldi_plate_map'] == '':
-        print(get_iso8601_timestamp() + ':' + 'Plate map is required for MALDI dried droplet data...')
-        print(get_iso8601_timestamp() + ':' + 'Exiting...')
+        sys.stderr.write(get_iso8601_timestamp() + ':' + 'Plate map is required for MALDI dried droplet data...')
+        sys.stderr.write(get_iso8601_timestamp() + ':' + 'Exiting...')
         sys.exit(1)
     elif args['maldi_output_mode'] != '' \
             and args['maldi_output_mode'] in ['individual', 'sample'] \
             and not os.path.exists(args['maldi_plate_map']):
-        print(get_iso8601_timestamp() + ':' + 'Plate map path does not exist...')
-        print(get_iso8601_timestamp() + ':' + 'Exiting...')
+        sys.stderr.write(get_iso8601_timestamp() + ':' + 'Plate map path does not exist...')
+        sys.stderr.write(get_iso8601_timestamp() + ':' + 'Exiting...')
         sys.exit(1)

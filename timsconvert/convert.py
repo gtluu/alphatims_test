@@ -17,6 +17,13 @@ def convert_raw_file(tuple_args, gui=False):
     # Set output directory to default if not specified.
     if run_args['outdir'] == '':
         run_args['outdir'] = os.path.split(infile)[0]
+        if not os.path.isdir(run_args['outdir']) and run_args['outdir'] != '':
+            try:
+                os.makedirs(run_args['outdir'])
+            except OSError:
+                sys.stderr.write(get_iso8601_timestamp() + ':' + 'Output directory could not be created...')
+                sys.stderr.write(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + infile + '...')
+                return
 
     # Initialize logger if not running on server.
     logname = 'tmp_log_' + os.path.splitext(os.path.split(infile)[-1])[0] + '.log'
@@ -31,7 +38,7 @@ def convert_raw_file(tuple_args, gui=False):
         logfile = os.path.join(run_args['outdir'], logname)
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
-    logging.basicConfig(filename=logfile, level=logging.INFO)
+    logging.basicConfig(filename=logfile, level=logging.DEBUG)
     if run_args['verbose']:
         logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
@@ -49,11 +56,24 @@ def convert_raw_file(tuple_args, gui=False):
                 use_recalibrated_state = False
             elif not run_args['use_raw_calibration']:
                 use_recalibrated_state = True
-            data = TimsconvertTsfData(infile, tdf_sdk_dll, use_recalibrated_state=use_recalibrated_state)
+            else:
+                logging.warning(get_iso8601_timestamp() + ':' + 'Calibration state for ' + infile + ' could not be determined...')
+                logging.warning(get_iso8601_timestamp() + ':' + 'Recalibrated mass data will be used if available...')
+                use_recalibrated_state = True
+            try:
+                data = TimsconvertTsfData(infile, tdf_sdk_dll, use_recalibrated_state=use_recalibrated_state)
+            except:
+                logging.error(get_iso8601_timestamp() + ':' + 'Error loading ' + infile + '...')
+                logging.error(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + infile + '...')
+                return
         elif schema == 'TDF':
             if run_args['use_raw_calibration']:
                 use_recalibrated_state = False
             elif not run_args['use_raw_calibration']:
+                use_recalibrated_state = True
+            else:
+                logging.warning(get_iso8601_timestamp() + ':' + 'Calibration state for ' + infile + ' could not be determined...')
+                logging.warning(get_iso8601_timestamp() + ':' + 'Recalibrated mass data will be used if available...')
                 use_recalibrated_state = True
             if run_args['pressure_compensation_strategy'] == 'none':
                 pressure_compensation_strategy = PressureCompensationStrategy.NoPressureCompensation
@@ -61,16 +81,39 @@ def convert_raw_file(tuple_args, gui=False):
                 pressure_compensation_strategy = PressureCompensationStrategy.AnalyisGlobalPressureCompensation
             elif run_args['pressure_compensation_strategy'] == 'frame':
                 pressure_compensation_strategy = PressureCompensationStrategy.PerFramePressureCompensation
-            data = TimsconvertTdfData(infile,
-                                      tdf_sdk_dll,
-                                      use_recalibrated_state=use_recalibrated_state,
-                                      pressure_compensation_strategy=pressure_compensation_strategy)
+            else:
+                logging.warning(get_iso8601_timestamp() + ':' + 'Pressure compensation strategy for ' + infile + ' could not be determined...')
+                logging.warning(get_iso8601_timestamp() + ':' + 'Using global pressure compensation...')
+                pressure_compensation_strategy = PressureCompensationStrategy.AnalyisGlobalPressureCompensation
+            try:
+                data = TimsconvertTdfData(infile,
+                                          tdf_sdk_dll,
+                                          use_recalibrated_state=use_recalibrated_state,
+                                          pressure_compensation_strategy=pressure_compensation_strategy)
+            except:
+                logging.error(get_iso8601_timestamp() + ':' + 'Error loading ' + infile + '...')
+                logging.error(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + infile + '...')
+                return
         elif schema == 'BAF':
             if run_args['use_raw_calibration']:
                 raw_calibration = True
             elif not run_args['use_raw_calibration']:
                 raw_calibration = False
-            data = TimsconvertBafData(infile, baf2sql_dll, raw_calibration=raw_calibration)
+            else:
+                logging.error(
+                    get_iso8601_timestamp() + ':' + 'Calibration state for ' + infile + ' could not be determined...')
+                logging.error(get_iso8601_timestamp() + ':' + 'Recalibrated mass data will be used if available...')
+                raw_calibration = False
+            try:
+                data = TimsconvertBafData(infile, baf2sql_dll, raw_calibration=raw_calibration)
+            except:
+                logging.error(get_iso8601_timestamp() + ':' + 'Error loading ' + infile + '...')
+                logging.error(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + infile + '...')
+                return
+        else:
+            logging.error(get_iso8601_timestamp() + ':' + 'Schema for ' + infile + ' could not be determined...')
+            logging.error(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + infile + '...')
+            return
     else:
         return
 
@@ -95,7 +138,8 @@ def convert_raw_file(tuple_args, gui=False):
                         run_args['intensity_encoding'],
                         run_args['mobility_encoding'],
                         run_args['compression'],
-                        run_args['barebones_metadata'])
+                        run_args['barebones_metadata'],
+                        gui=gui)
 
     # TSF ESI-MS Dataset
     elif schema == 'TSF' and 'MaldiApplicationType' not in data.analysis['GlobalMetadata'].keys():
@@ -114,7 +158,8 @@ def convert_raw_file(tuple_args, gui=False):
                         run_args['intensity_encoding'],
                         run_args['mobility_encoding'],
                         run_args['compression'],
-                        run_args['barebones_metadata'])
+                        run_args['barebones_metadata'],
+                        gui=gui)
 
     # TSF MALDI-qTOF Dried Droplet Dataset
     elif schema == 'TSF' \
@@ -137,7 +182,8 @@ def convert_raw_file(tuple_args, gui=False):
                             run_args['compression'],
                             run_args['maldi_output_mode'],
                             run_args['maldi_plate_map'],
-                            run_args['barebones_metadata'])
+                            run_args['barebones_metadata'],
+                            gui=gui)
 
     # TSF MALDI-qTOF MSI Dataset
     elif schema == 'TSF' \
@@ -156,7 +202,8 @@ def convert_raw_file(tuple_args, gui=False):
                               run_args['mz_encoding'],
                               run_args['intensity_encoding'],
                               run_args['mobility_encoding'],
-                              run_args['compression'])
+                              run_args['compression'],
+                              gui=gui)
 
     # TDF ESI-TIMS-MS Dataset
     elif schema == 'TDF' \
@@ -176,7 +223,8 @@ def convert_raw_file(tuple_args, gui=False):
                         run_args['intensity_encoding'],
                         run_args['mobility_encoding'],
                         run_args['compression'],
-                        run_args['barebones_metadata'])
+                        run_args['barebones_metadata'],
+                        gui=gui)
 
     # TDF MALDI-TIMS-qTOF Dried Droplet Dataset
     elif schema == 'TDF' \
@@ -199,7 +247,8 @@ def convert_raw_file(tuple_args, gui=False):
                             run_args['compression'],
                             run_args['maldi_output_mode'],
                             run_args['maldi_plate_map'],
-                            run_args['barebones_metadata'])
+                            run_args['barebones_metadata'],
+                            gui=gui)
 
     # TDF MALDI-TIMS-qTOF MSI Dataset
     elif schema == 'TDF' \
@@ -227,7 +276,8 @@ def convert_raw_file(tuple_args, gui=False):
                                          run_args['mz_encoding'],
                                          run_args['intensity_encoding'],
                                          run_args['mobility_encoding'],
-                                         run_args['iprm_output_mode'])
+                                         run_args['iprm_output_mode'],
+                                         gui=gui)
             elif run_args['iprm_format'] == 'mzml':
                 logging.info(get_iso8601_timestamp() + ':' + 'Writing data to mzML file(s)...')
                 outfile = os.path.splitext(os.path.split(infile)[-1])[0] + '.mzML'
@@ -244,7 +294,8 @@ def convert_raw_file(tuple_args, gui=False):
                                           run_args['mobility_encoding'],
                                           run_args['compression'],
                                           run_args['barebones_metadata'],
-                                          run_args['iprm_output_mode'])
+                                          run_args['iprm_output_mode'],
+                                          gui=gui)
             elif run_args['iprm_format'] == 'imzml':
                 logging.info(get_iso8601_timestamp() + ':' + 'Writing data to imzML file(s)...')
                 outfile = os.path.splitext(os.path.split(infile)[-1])[0] + '.imzML'
@@ -258,7 +309,8 @@ def convert_raw_file(tuple_args, gui=False):
                                            run_args['mz_encoding'],
                                            run_args['intensity_encoding'],
                                            run_args['mobility_encoding'],
-                                           run_args['compression'])
+                                           run_args['compression'],
+                                           gui=gui)
         # Standard imzML export workflow.
         else:
             logging.info(get_iso8601_timestamp() + ':' + '.tdf file detected...')
@@ -274,12 +326,13 @@ def convert_raw_file(tuple_args, gui=False):
                                   run_args['mz_encoding'],
                                   run_args['intensity_encoding'],
                                   run_args['mobility_encoding'],
-                                  run_args['compression'])
+                                  run_args['compression'],
+                                  gui=gui)
 
     else:
-        logging.warning(get_iso8601_timestamp() + ':' + 'Unable to determine acquisition mode using metadata for' +
+        logging.error(get_iso8601_timestamp() + ':' + 'Unable to determine acquisition mode using metadata for ' +
                         infile + '...')
-        logging.warning(get_iso8601_timestamp() + ':' + 'Exiting...')
+        logging.error(get_iso8601_timestamp() + ':' + 'Skipping conversion of ' + infile + '...')
 
     logging.info('\n')
 
@@ -306,11 +359,11 @@ def clean_up_logfiles(args, list_of_logfiles):
         final_logfile = os.path.join(args['outdir'], logname)
     with open(final_logfile, 'w') as final_logfile_obj:
         final_logfile_obj.write(concat_logfile)
-        print(get_iso8601_timestamp() + ':' + 'Final log file written to ' + final_logfile + '...')
+        sys.stdout.write(get_iso8601_timestamp() + ':' + 'Final log file written to ' + final_logfile + '...')
     # Delete temporary log files.
     for logfile in list_of_logfiles:
         try:
             os.remove(logfile)
-            print(get_iso8601_timestamp() + ':' + 'Removed temporary log file ' + logfile + '...')
+            sys.stderr.write(get_iso8601_timestamp() + ':' + 'Removed temporary log file ' + logfile + '...')
         except OSError:
-            print(get_iso8601_timestamp() + ':' + 'Unable to remove temporary log file ' + logfile + '...')
+            sys.stderr.write(get_iso8601_timestamp() + ':' + 'Unable to remove temporary log file ' + logfile + '...')
