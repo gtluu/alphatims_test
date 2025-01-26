@@ -85,7 +85,7 @@ def get_args():
                           help=arg_descriptions['maldi_output_mode'],
                           default='combined',
                           type=str,
-                          choices=['combined', 'individual', 'group'])  # TODO: refactor 'sample' to 'group'
+                          choices=['combined', 'individual', 'group'])
     optional.add_argument('--maldi_plate_map',
                           help=arg_descriptions['maldi_plate_map'],
                           default='',

@@ -242,15 +242,15 @@ class Ui_TimsconvertGuiWindow(object):
         self.MaldiOutputModeIndividualRadio = QRadioButton(self.main)
         self.MaldiOutputModeIndividualRadio.setObjectName(u"MaldiOutputModeIndividualRadio")
         self.MaldiOutputModeIndividualRadio.setGeometry(QRect(430, 720, 351, 20))
-        # Sample
-        self.MaldiOutputModeSampleRadio = QRadioButton(self.main)
-        self.MaldiOutputModeSampleRadio.setObjectName(u"MaldiOutputModeSampleRadio")
-        self.MaldiOutputModeSampleRadio.setGeometry(QRect(430, 750, 351, 20))
+        # Group
+        self.MaldiOutputModeGroupRadio = QRadioButton(self.main)
+        self.MaldiOutputModeGroupRadio.setObjectName(u"MaldiOutputModeGroupRadio")
+        self.MaldiOutputModeGroupRadio.setGeometry(QRect(430, 750, 351, 20))
         # Group
         self.MaldiOutputModeGroup = QButtonGroup()
         self.MaldiOutputModeGroup.addButton(self.MaldiOutputModeCombinedRadio)
         self.MaldiOutputModeGroup.addButton(self.MaldiOutputModeIndividualRadio)
-        self.MaldiOutputModeGroup.addButton(self.MaldiOutputModeSampleRadio)
+        self.MaldiOutputModeGroup.addButton(self.MaldiOutputModeGroupRadio)
         self.MaldiOutputModeCombinedRadio.setChecked(True)
 
         # MALDI Plate Map
@@ -357,8 +357,8 @@ class Ui_TimsconvertGuiWindow(object):
         self.MaldiOutputModeIndividualRadio.setText(QCoreApplication.translate("TimsconvertGuiWindow",
                                                                                u"Export Each Spectrum In a *.d File to Individual mzML Files",
                                                                                None))
-        self.MaldiOutputModeSampleRadio.setText(QCoreApplication.translate("TimsconvertGuiWindow",
-                                                                           u"Group Spectra with Matching Sample Names into mzML Files",
+        self.MaldiOutputModeGroupRadio.setText(QCoreApplication.translate("TimsconvertGuiWindow",
+                                                                           u"Group Spectra with Matching Group Names into mzML Files",
                                                                            None))
         self.MaldiPlateMapBrowseButton.setText(QCoreApplication.translate("TimsconvertGuiWindow", u"Browse", None))
         self.MaldiPlateMapLabel.setText(

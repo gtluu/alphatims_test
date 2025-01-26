@@ -320,7 +320,7 @@
      <string>Export Each Spectrum In a *.d File to Individual mzML Files</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="MaldiOutputModeSampleRadio">
+   <widget class="QRadioButton" name="MaldiOutputModeGroupRadio">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -330,7 +330,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Group Spectra with Matching Sample Names into mzML Files</string>
+     <string>Group Spectra with Matching Group Names into mzML Files</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="MaldiPlateMapLine">

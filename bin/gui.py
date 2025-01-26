@@ -242,16 +242,16 @@ class TimsconvertGuiWindow(QMainWindow, Ui_TimsconvertGuiWindow):
             self.args['profile_bins'] = 0
         if (self.MaldiOutputModeCombinedRadio.isChecked() and
                 not self.MaldiOutputModeIndividualRadio.isChecked() and
-                not self.MaldiOutputModeSampleRadio.isChecked()):
+                not self.MaldiOutputModeGroupRadio.isChecked()):
             self.args['maldi_output_mode'] = 'combined'
         elif (not self.MaldiOutputModeCombinedRadio.isChecked() and
               self.MaldiOutputModeIndividualRadio.isChecked() and
-              not self.MaldiOutputModeSampleRadio.isChecked()):
+              not self.MaldiOutputModeGroupRadio.isChecked()):
             self.args['maldi_output_mode'] = 'individual'
         elif (not self.MaldiOutputModeCombinedRadio.isChecked() and
               not self.MaldiOutputModeIndividualRadio.isChecked() and
-              self.MaldiOutputModeSampleRadio.isChecked()):
-            self.args['maldi_output_mode'] = 'sample'
+              self.MaldiOutputModeGroupRadio.isChecked()):
+            self.args['maldi_output_mode'] = 'group'
         self.args['maldi_plate_map'] = str(self.MaldiPlateMapLine.text())
         if self.MaldiImzmlModeProcessedRadio.isChecked() and not self.MaldiImzmlModeContinuousRadio.isChecked():
             self.args['imzml_mode'] = 'processed'
@@ -282,7 +282,7 @@ class TimsconvertGuiWindow(QMainWindow, Ui_TimsconvertGuiWindow):
                         logging.info(get_iso8601_timestamp() + ':' + 'Skipping...')
 
             # Convert each sample.
-            list_of_logfiles = [convert_raw_file((self.args, infile)) for infile in input_files]
+            list_of_logfiles = [convert_raw_file((self.args, infile), gui=True) for infile in input_files]
             """with Pool(processes=cpu_count() - 1) as pool:
                 pool_map_input = [(self.args, infile) for infile in input_files]
                 list_of_logfiles = pool.map(convert_raw_file, pool_map_input)

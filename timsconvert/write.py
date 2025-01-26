@@ -667,7 +667,7 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
     :type compression: str
     :param maldi_output_mode: Determines whether all spectra from a given .d dataset are written to a single mzML file
         ("combined"), written to individual mzML files ("individual", i.e. one spectrum per file), or grouped to have
-        one mzML file per annotation/label/condition ("sample", requires CSV plate_map to be specified).
+        one mzML file per annotation/label/condition ("group", requires CSV plate_map to be specified).
     :type maldi_output_mode: str
     :param plate_map: Path to the MALDI plate map in CSV format.
     :type plate_map: str
@@ -810,7 +810,7 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
                                                 mobility_encoding)
 
             # Use plate map to determine filename.
-            # Names things as sample_position.mzML
+            # Names things as group_position.mzML
             plate_map_dict = parse_maldi_plate_map(plate_map)
 
             progress_counter = 0
@@ -863,8 +863,8 @@ def write_maldi_dd_mzml(data, infile, outdir, outfile, mode, ms2_only, exclude_m
                                      str(round((progress_counter / len(list_of_scans)) * 100)) +
                                      '%\n')
 
-    # Group spectra from a given TSF or TDF file by sample name based on user provided plate map.
-    elif maldi_output_mode == 'sample' and plate_map != '':
+    # Group spectra from a given TSF or TDF file by group name based on user provided plate map.
+    elif maldi_output_mode == 'group' and plate_map != '':
         # Check to make sure plate map is a valid csv file.
         if os.path.exists(plate_map) and os.path.splitext(plate_map)[1] == '.csv':
             # Parse all MALDI data.
