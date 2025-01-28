@@ -83,6 +83,18 @@ def get_args():
                           default='processed',
                           type=str,
                           choices=['processed', 'continuous'])
+    # add another argument for how to handle number of scans per file:
+    # Can be minimum, maximum, or mean number of scans per line-scan or a user defined number of scans per line.
+    # TODO: Add arg_descriptions for these parameters
+    optional.add_argument('--scans_per_line',
+                            help=arg_descriptions['scans_per_line'],
+                            default='mean',
+                            type=str,
+                            choices=['minimum', 'maximum', 'mean', 'user_defined'])
+    optional.add_argument('--scans_per_line_value', 
+                            help=arg_descriptions['scans_per_line_value'],
+                            default=0,
+                            type=int)
 
     # System Arguments
     system = parser.add_argument_group('System Parameters')
