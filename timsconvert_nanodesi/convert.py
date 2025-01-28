@@ -94,6 +94,8 @@ def get_frame_id_for_each_coordinate(input_files, run_args):
 def convert_raw_file(tuple_args):
     run_args = tuple_args[0]
     infile = tuple_args[1]
+    line_number = tuple_args[2]
+    frame_ids_at_each_coord = tuple_args[3]
     # Set output directory to default if not specified.
     if run_args['outdir'] == '':
         run_args['outdir'] = os.path.split(infile)[0]
@@ -181,6 +183,8 @@ def convert_raw_file(tuple_args):
                          intensity_encoding=run_args['intensity_encoding'],
                          mobility_encoding=run_args['mobility_encoding'],
                          compression=run_args['compression'],
+                         line_number=line_number,
+                         frame_id_for_each_coord=frame_ids_at_each_coord,
                          chunk_size=10)
 
     logging.info('\n')

@@ -118,3 +118,8 @@ def args_check(args):
     # Check if output directory exists and create it if it does not.
     if not os.path.isdir(args['outdir']) and args['outdir'] != '':
         os.makedirs(args['outdir'])
+
+    # Check that the user defines the number of scans per line if scans_per_line is set to user_defined
+    if args["scans_per_line"] == "user_defined":
+        if args["scans_per_line_value"] == 0:
+            raise ValueError("User defined scans per line value must be greater than 0.")
