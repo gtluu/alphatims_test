@@ -87,12 +87,12 @@ def get_args():
     # Can be minimum, maximum, or mean number of scans per line-scan or a user defined number of scans per line.
     # TODO: Add arg_descriptions for these parameters
     optional.add_argument('--scans_per_line',
-                            help=arg_descriptions['scans_per_line'],
+                            help="The method used for determining how to determine the number of pixels to use in the scanning direction. Can be \"minimum\", \"maximum\", \"mean\", or \"user_defined\". Defaults to \"mean\"",#arg_descriptions['scans_per_line'],
                             default='mean',
                             type=str,
                             choices=['minimum', 'maximum', 'mean', 'user_defined'])
     optional.add_argument('--scans_per_line_value', 
-                            help=arg_descriptions['scans_per_line_value'],
+                            help="The integer number of pixels to use in the scanning direction if scans_per_line is set to \"user_defined\"",#arg_descriptions['scans_per_line_value'],
                             default=0,
                             type=int)
 

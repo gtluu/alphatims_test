@@ -71,8 +71,6 @@ def write_nanodesi_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mod
                                                      mz_encoding,
                                                      intensity_encoding,
                                                      mobility_encoding)
-        # TODO: Emerson: convert retention time to x-y coord
-        # implementation of interpolate_to_determine_pixel_locations method?
         if mode == 'profile':
             exclude_mobility = True
         if not exclude_mobility:
