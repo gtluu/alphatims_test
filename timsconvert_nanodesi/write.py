@@ -6,10 +6,11 @@ import logging
 from pyimzml.ImzMLWriter import ImzMLWriter
 from pyimzml.compression import NoCompression, ZlibCompression
 from pyTDFSDK.util import get_encoding_dtype
-
+# TODO: Emerson: Need to load all input files in order to get all retention times first.
+# This lets us get a mask of where to assign spectra for each scan, which aligns spectra spatially.
 
 def write_nanodesi_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mode, exclude_mobility, profile_bins,
-                                  mz_encoding, intensity_encoding, mobility_encoding):
+                                  mz_encoding, intensity_encoding, mobility_encoding, line_number, frame_id_for_each_coord):
     """
     Parse and write out a group of spectra to an imzML file from a nano-DESI timsTOF fleX MSI dataset using pyimzML.
 
@@ -33,6 +34,10 @@ def write_nanodesi_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mod
     :type intensity_encoding: int
     :param mobility_encoding: Mobility encoding command line parameter, either "64" or "32".
     :type mobility_encoding: int
+    :param line_number: Line number of the input file.
+    :type line_number: int
+    :param frame_id_for_each_coord: list containing frame IDs for each coordinate.
+    :type frame_id_for_each_coord: list
     """
     # Parse and write TSF data.
     if isinstance(data, TimsconvertTsfData):
@@ -44,12 +49,16 @@ def write_nanodesi_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mod
                                                      profile_bins,
                                                      mz_encoding,
                                                      intensity_encoding)
-        # TODO: Emerson: convert retention time to x-y coord
-        # implementation of interpolate_to_determine_pixel_locations method?
-        for scans in parent_scans:
-            imzml_file.addSpectrum(scans.mz_array,
-                                   scans.intensity_array,
-                                   scans.coord)
+        # TODO: Test this. It uses a list containing the frame ID to be used in each coordinate.
+        for i, scans in parent_scans:
+            frame_id = i+frame_start
+            # Get index values where frame_id matches the frame_id_for_each_coord list.
+            frame_id_matches = [idx for idx, x in enumerate(frame_id_for_each_coord) if x == frame_id]
+            for idx in frame_id_matches:
+                coord = (line_number, idx)
+                imzml_file.addSpectrum(scans.mz_array,
+                                       scans.intensity_array,
+                                       coord)
     # Parse and write TDF data.
     elif isinstance(data, TimsconvertTdfData):
         parent_scans, product_scans = parse_lcms_tdf(data,
@@ -62,21 +71,31 @@ def write_nanodesi_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mod
                                                      mz_encoding,
                                                      intensity_encoding,
                                                      mobility_encoding)
-        # TODO: Emerson: convert retention time to x-y coord
-        # implementation of interpolate_to_determine_pixel_locations method?
         if mode == 'profile':
             exclude_mobility = True
         if not exclude_mobility:
-            for scans in parent_scans:
-                imzml_file.addSpectrum(scans.mz_array,
-                                       scans.intensity_array,
-                                       scans.coord,
-                                       mobilities=scans.mobility_array)
+            # TODO: Test this. It uses a list containing the frame ID to be used in each coordinate.
+            for i, scans in parent_scans:
+                frame_id = i+frame_start
+                # Get index values where frame_id matches the frame_id_for_each_coord list.
+                frame_id_matches = [idx for idx, x in enumerate(frame_id_for_each_coord) if x == frame_id]
+                for idx in frame_id_matches:
+                    coord = (line_number, idx)
+                    imzml_file.addSpectrum(scans.mz_array,
+                                        scans.intensity_array,
+                                        coord,
+                                        mobilities=scans.mobility_array)
         elif exclude_mobility:
-            for scans in parent_scans:
-                imzml_file.addSpectrum(scans.mz_array,
-                                       scans.intensity_array,
-                                       scans.coord)
+            # TODO: Test this. It uses a list containing the frame ID to be used in each coordinate.
+            for i, scans in parent_scans:
+                frame_id = i+frame_start
+                # Get index values where frame_id matches the frame_id_for_each_coord list.
+                frame_id_matches = [idx for idx, x in enumerate(frame_id_for_each_coord) if x == frame_id]
+                for idx in frame_id_matches:
+                    coord = (line_number, idx)
+                    imzml_file.addSpectrum(scans.mz_array,
+                                        scans.intensity_array,
+                                        coord)
     # Parse and write BAF data.
     elif isinstance(data, TimsconvertBafData):
         parent_scans, product_scans = parse_lcms_baf(data,
@@ -87,16 +106,22 @@ def write_nanodesi_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mod
                                                      profile_bins,
                                                      mz_encoding,
                                                      intensity_encoding)
-        # TODO: Emerson: convert retention time to x-y coord
-        # implementation of interpolate_to_determine_pixel_locations method?
-        for scans in parent_scans:
-            imzml_file.addSpectrum(scans.mz_array,
-                                   scans.intensity_array,
-                                   scans.coord)
+        # TODO: Test this. It uses a list containing the frame ID to be used in each coordinate.
+        for i, scans in parent_scans:
+            frame_id = i+frame_start
+            # Get index values where frame_id matches the frame_id_for_each_coord list.
+            frame_id_matches = [idx for idx, x in enumerate(frame_id_for_each_coord) if x == frame_id]
+            for idx in frame_id_matches:
+                coord = (line_number, idx)
+                imzml_file.addSpectrum(scans.mz_array,
+                                    scans.intensity_array,
+                                    coord,
+                                    mobilities=scans.mobility_array)
+
 
 
 def write_nanodesi_imzml(data, outdir, outfile, mode, exclude_mobility, profile_bins, imzml_mode, mz_encoding,
-                         intensity_encoding, mobility_encoding, compression, chunk_size=10):
+                         intensity_encoding, mobility_encoding, compression, line_number, frame_id_for_each_coord, chunk_size=10):
     """
     Parse and write out spectra to an imzML file from a nano-DESI timsTOF fleX MSI dataset using pyimzML.
 
@@ -211,7 +236,9 @@ def write_nanodesi_imzml(data, outdir, outfile, mode, exclude_mobility, profile_
                                               profile_bins,
                                               mz_encoding,
                                               intensity_encoding,
-                                              mobility_encoding)
+                                              mobility_encoding,
+                                              line_number, 
+                                              frame_id_for_each_coord)
                 sys.stdout.write(get_iso8601_timestamp() +
                                  ':' +
                                  data.source_file.replace('/', '\\') +
@@ -241,7 +268,9 @@ def write_nanodesi_imzml(data, outdir, outfile, mode, exclude_mobility, profile_
                                               profile_bins,
                                               mz_encoding,
                                               intensity_encoding,
-                                              mobility_encoding)
+                                              mobility_encoding,
+                                              line_number, 
+                                              frame_id_for_each_coord)
                 sys.stdout.write(get_iso8601_timestamp() +
                                  ':' +
                                  data.source_file.replace('/', '\\') +
