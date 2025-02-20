@@ -33,7 +33,8 @@ def main():
 
     # Convert each sample
     with Pool(processes=cpu_count() - 1) as pool:
-        pool_map_input = [(args, infile, line_number+1, frame_ids_at_each_coord[line_number]) for line_number, infile in enumerate(input_files)]
+        pool_map_input = [(args, infile, line_number+1, frame_ids_at_each_coord[line_number])
+                          for line_number, infile in enumerate(input_files)]
         list_of_logfiles = pool.map(convert_raw_file, pool_map_input)
     list_of_logfiles = list(filter(None, list_of_logfiles))
 

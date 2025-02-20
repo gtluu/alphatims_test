@@ -10,8 +10,10 @@ from pyTDFSDK.util import get_encoding_dtype
 # TODO: Emerson: Need to load all input files in order to get all retention times first.
 # This lets us get a mask of where to assign spectra for each scan, which aligns spectra spatially.
 
+
 def write_nanodesi_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mode, exclude_mobility, profile_bins,
-                                  mz_encoding, intensity_encoding, mobility_encoding, line_number, frame_id_for_each_coord):
+                                  mz_encoding, intensity_encoding, mobility_encoding, line_number,
+                                  frame_id_for_each_coord):
     """
     Parse and write out a group of spectra to an imzML file from a nano-DESI timsTOF fleX MSI dataset using pyimzML.
 
@@ -83,9 +85,9 @@ def write_nanodesi_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mod
                 for idx in frame_id_matches:
                     coord = (line_number, idx)
                     imzml_file.addSpectrum(scans.mz_array,
-                                        scans.intensity_array,
-                                        coord,
-                                        mobilities=scans.mobility_array)
+                                           scans.intensity_array,
+                                           coord,
+                                           mobilities=scans.mobility_array)
         elif exclude_mobility:
             # TODO: Test this. It uses a list containing the frame ID to be used in each coordinate.
             for i, scans in parent_scans:
@@ -95,8 +97,8 @@ def write_nanodesi_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mod
                 for idx in frame_id_matches:
                     coord = (line_number, idx)
                     imzml_file.addSpectrum(scans.mz_array,
-                                        scans.intensity_array,
-                                        coord)
+                                           scans.intensity_array,
+                                           coord)
     # Parse and write BAF data.
     elif isinstance(data, TimsconvertBafData):
         parent_scans, product_scans = parse_lcms_baf(data,
@@ -115,14 +117,14 @@ def write_nanodesi_chunk_to_imzml(data, imzml_file, frame_start, frame_stop, mod
             for idx in frame_id_matches:
                 coord = (line_number, idx)
                 imzml_file.addSpectrum(scans.mz_array,
-                                    scans.intensity_array,
-                                    coord,
-                                    mobilities=scans.mobility_array)
-
+                                       scans.intensity_array,
+                                       coord,
+                                       mobilities=scans.mobility_array)
 
 
 def write_nanodesi_imzml(data, outdir, outfile, mode, exclude_mobility, profile_bins, imzml_mode, mz_encoding,
-                         intensity_encoding, mobility_encoding, compression, line_number, frame_id_for_each_coord, chunk_size=10):
+                         intensity_encoding, mobility_encoding, compression, line_number, frame_id_for_each_coord,
+                         chunk_size=10):
     """
     Parse and write out spectra to an imzML file from a nano-DESI timsTOF fleX MSI dataset using pyimzML.
 
@@ -150,6 +152,10 @@ def write_nanodesi_imzml(data, outdir, outfile, mode, exclude_mobility, profile_
     :type mobility_encoding: int
     :param compression: Compression command line parameter, either "zlib" or "none".
     :type compression: str
+    :param line_number: Line number of the input file.
+    :type line_number: int
+    :param frame_id_for_each_coord: list containing frame IDs for each coordinate.
+    :type frame_id_for_each_coord: list
     :param chunk_size: Number of MS1 spectra that to be used when subsetting dataset into smaller groups to pass onto
         timsconvert.write.write_lcms_chunk_to_mzml() for memory efficiency; larger chunk_size requires more memory
         during conversion.

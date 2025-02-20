@@ -9,6 +9,7 @@ from pyTDFSDK.init_tdf_sdk import init_tdf_sdk_api
 from pyTDFSDK.ctypes_data_structures import PressureCompensationStrategy
 from pyBaf2Sql.init_baf2sql import init_baf2sql_api
 
+
 # Gets the info needed to get coordinants from retention times.
 def get_frame_id_for_each_coordinate(input_files, run_args):
     tdf_sdk_dll = init_tdf_sdk_api()
@@ -84,7 +85,8 @@ def get_frame_id_for_each_coordinate(input_files, run_args):
         Y = scan_ids_per_line[i]
 
         # 1d nearest neighbor interpolation of scan times, with the frame IDs as the output values.
-        frame_ids_at_each_coord.append([Y[min(range(len(X)), key=lambda j: abs(X[j] - xr))] for xr in points_to_sample_at])
+        frame_ids_at_each_coord.append([Y[min(range(len(X)), key=lambda j: abs(X[j] - xr))]
+                                        for xr in points_to_sample_at])
 
     return frame_ids_at_each_coord
 
