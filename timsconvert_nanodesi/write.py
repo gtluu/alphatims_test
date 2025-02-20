@@ -1,5 +1,6 @@
 from timsconvert.parse import parse_lcms_baf, parse_lcms_tsf, parse_lcms_tdf
 from timsconvert.classes import TimsconvertBafData, TimsconvertTsfData, TimsconvertTdfData
+from timsconvert.timestamp import get_iso8601_timestamp
 import os
 import sys
 import logging
